@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IPL SIM — Cricket Match Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* ════════════════════════════════════════
+       LOGIN SCREEN
+       ════════════════════════════════════════ */
+
+    #loginScreen {
+      position: fixed; inset: 0; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg);
+      /* Same ambient as body but more intense */
+      background-image:
+        radial-gradient(ellipse 70% 50% at 15% 25%, rgba(0,212,255,0.09) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 85% 75%, rgba(255,107,53,0.07) 0%, transparent 65%),
+        radial-gradient(ellipse 50% 60% at 50% 100%, rgba(163,230,53,0.05) 0%, transparent 60%);
+      animation: loginFadeIn 0.4s ease;
+    }
+
+    @keyframes loginFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    /* Grid texture same as main */
+    #loginScreen::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        repeating-linear-gradient(90deg, rgba(255,255,255,0.005) 0px, transparent 1px, transparent 40px, rgba(255,255,255,0.005) 40px, transparent 41px),
+        repeating-linear-gradient(0deg,  rgba(255,255,255,0.005) 0px, transparent 1px, transparent 40px, rgba(255,255,255,0.005) 40px, transparent 41px);
+      pointer-events: none;
+    }
+
+    .login-card {
+      position: relative; z-index: 1;
+      background: rgba(13,19,32,0.85);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--accent);
+      border-radius: 16px;
+      padding: 48px 44px;
+      width: 400px;
+      max-width: 92vw;
+      backdrop-filter: blur(24px);
+      box-shadow:
+        0 0 0 1px rgba(0,212,255,0.05),
+        0 40px 80px rgba(0,0,0,0.6),
+        0 0 60px rgba(0,212,255,0.04);
+      animation: loginSlideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    @keyframes loginSlideUp {
+      from { transform: translateY(24px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    .login-card.shake {
+      animation: shake 0.45s cubic-bezier(.36,.07,.19,.97);
+    }
+    @keyframes shake {
+      10%, 90% { transform: translateX(-3px); }
+      20%, 80% { transform: translateX(5px); }
+      30%, 50%, 70% { transform: translateX(-5px); }
+      40%, 60% { transform: translateX(5px); }
+    }
+
+    .login-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.2rem;
+      letter-spacing: 5px;
+      color: var(--text);
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 6px;
+    }
+    .login-logo span { color: var(--accent); }
+
+    .login-logo-badge {
+      background: var(--accent2);
+      color: #fff;
+      font-size: 0.4rem;
+      font-family: 'Space Mono', monospace;
+      padding: 3px 7px;
+      border-radius: 3px;
+      letter-spacing: 2px;
+      align-self: flex-start;
+      margin-top: 6px;
+    }
+
+    .login-subtitle {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 36px;
+    }
+
+    .login-field {
+      margin-bottom: 18px;
+    }
+
+    .login-field label {
+      display: block;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .login-field input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .login-field input:focus {
+      border-color: var(--accent);
+      background: rgba(0,212,255,0.04);
+      box-shadow: 0 0 0 3px rgba(0,212,255,0.08);
+    }
+    .login-field input::placeholder {
+      color: rgba(90,112,128,0.6);
+    }
+
+    .login-error {
+      display: none;
+      background: rgba(255,71,87,0.08);
+      border: 1px solid rgba(255,71,87,0.25);
+      color: var(--danger);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      padding: 10px 14px;
+      border-radius: 6px;
+      margin-bottom: 18px;
+      letter-spacing: 0.5px;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 8px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent), #0098b8);
+      color: #000;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 3px;
+      cursor: pointer;
+      transition: box-shadow 0.25s, transform 0.15s;
+      box-shadow: 0 0 20px rgba(0,212,255,0.2);
+      margin-top: 4px;
+    }
+    .login-btn:hover {
+      box-shadow: 0 0 40px rgba(0,212,255,0.4);
+      transform: translateY(-1px);
+    }
+    .login-btn:active {
+      transform: translateY(0);
+    }
+
+    .login-footer {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(30,45,66,0.6);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      color: rgba(90,112,128,0.5);
+      text-align: center;
+      letter-spacing: 0.5px;
+      line-height: 1.6;
+    }
+
+    /* ════════════════════════════════════════
+       USER BADGE (header)
+       ════════════════════════════════════════ */
+
+    #userBadge {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 14px;
+    }
+
+    .user-badge-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 2px;
+      color: var(--text);
+    }
+
+    .user-badge-role {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 1.5px;
+    }
+
+    .user-badge-logout {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: color 0.2s, background 0.2s;
+      margin-left: 4px;
+    }
+    .user-badge-logout:hover {
+      color: var(--danger);
+      background: rgba(255,71,87,0.1);
+    }
+
+    /* ════════════════════════════════════════
+       PLAYING XI EDITOR (sidebar)
+       ════════════════════════════════════════ */
+
+    #playerTeamSection {
+      display: none;
+    }
+
+    .playing-xi-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .xi-slot {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .xi-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--muted);
+      width: 18px;
+      flex-shrink: 0;
+      text-align: right;
+    }
+
+    .xi-select {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 7px 10px;
+      border-radius: 6px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      margin-bottom: 0;
+      outline: none;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .xi-select:focus {
+      border-color: var(--accent);
+    }
+    .xi-select option { background: #111926; }
+
+    /* ════════════════════════════════════════
+       MASTER-ONLY / PLAYER-ONLY UI STATES
+       ════════════════════════════════════════ */
+
+    .player-locked-notice {
+      background: rgba(255,107,53,0.05);
+      border: 1px solid rgba(255,107,53,0.2);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem;
+      color: rgba(255,107,53,0.7);
+      line-height: 1.5;
+      letter-spacing: 0.3px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     LOGIN SCREEN
+     ══════════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-card" id="loginCard">
+    <div class="login-logo">
+      🏏 <span>SACKS</span>SIM
+      <span class="login-logo-badge">Baap Version</span>
+    </div>
+    <div class="login-subtitle">Cricket Match Simulator</div>
+
+    <div id="loginForm">
+      <div class="login-field">
+        <label for="loginUsername">Username</label>
+        <input type="text" id="loginUsername" placeholder="Enter username" autocomplete="username" autofocus>
+      </div>
+      <div class="login-field">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password">
+      </div>
+
+      <div class="login-error" id="loginError"></div>
+
+      <button class="login-btn" onclick="attemptLogin()">▶ &nbsp;Sign In</button>
+    </div>
+
+    <div class="login-footer">
+      SACKS SIM · PRIVATE ACCESS ONLY<br>
+      Contact Aqua, Anuj or Pranav for credentials
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MAIN APP (hidden until login)
+     ══════════════════════════════════════════ -->
+<div id="appWrapper" style="display:none">
+<div class="wrap">
+
+  <!-- ── HEADER ── -->
+  <header>
+    <div class="logo">
+      🏏 <span>SACKS</span>SIM
+      <span class="logo-badge">Baap Version</span>
+    </div>
+    <nav>
+      <button class="nav-btn active" onclick="showPage('sim')">Simulator</button>
+      <button class="nav-btn" onclick="toggleDashboard()">📊 Dashboard</button>
+      <button class="nav-btn" onclick="showPage('howto')">How It Works</button>
+    </nav>
+    <!-- User badge injected here -->
+    <div id="userBadge"></div>
+  </header>
+
+  <main>
+
+    <!-- ── SIDEBAR ── -->
+    <sidebar>
+
+      <!-- Player Team Management Section (player-level only) -->
+      <div id="playerTeamSection"></div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">Match Setup</div>
+
+        <label for="team1Select">Team 1 (Bats First)</label>
+        <select id="team1Select"><option value="">— Select Team —</option></select>
+
+        <label for="team2Select">Team 2</label>
+        <select id="team2Select"><option value="">— Select Team —</option></select>
+
+        <label for="venueSelect">Venue</label>
+        <select id="venueSelect"><option value="">— Select Venue —</option></select>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">Pitch &amp; Conditions</div>
+
+        <label for="pitchType">Pitch Type</label>
+        <select id="pitchType">
+          <option value="balanced">Balanced</option>
+          <option value="green">Green (Seamer Friendly)</option>
+          <option value="dusty">Dusty (Spin Friendly)</option>
+          <option value="dead">Dead (Flat Batting Track)</option>
+          <option value="bouncy">Bouncy (High Pace)</option>
+        </select>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Dew Factor</div>
+            <div class="toggle-sub">Helps batting team in 2nd innings</div>
+          </div>
+          <button class="toggle" id="dewToggle" onclick="this.classList.toggle('on')"></button>
+        </div>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">Pitch Deterioration</div>
+            <div class="toggle-sub">Surface worsens over match</div>
+          </div>
+          <button class="toggle" id="detToggle" onclick="this.classList.toggle('on')"></button>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">Bowling Strategy</div>
+        <button class="btn btn-secondary" onclick="openBowlingModal()">📋 Set Bowling Orders</button>
+        <div style="font-size:0.7rem; color:var(--muted); margin-top:8px; line-height:1.4;">Leaving empty slots means the bot makes the changes</div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">Simulation Mode</div>
+
+        <div class="toggle-row">
+          <div>
+            <div class="toggle-label">🔴 Live Match</div>
+            <div class="toggle-sub">Ball-by-ball, 1 second per delivery</div>
+          </div>
+          <button class="toggle" id="liveToggle" onclick="this.classList.toggle('on')"></button>
+        </div>
+
+        <div id="liveSpeedRow" style="margin-top:12px;display:none">
+          <label for="liveSpeed">Simulation Speed</label>
+          <select id="liveSpeed">
+            <option value="1200">Slow (1.2s / ball)</option>
+            <option value="800" selected>Normal (0.8s / ball)</option>
+            <option value="400">Fast (0.4s / ball)</option>
+            <option value="150">Turbo (0.15s / ball)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-title">Toss</div>
+
+        <label for="tossWinner">Toss Winner</label>
+        <select id="tossWinner">
+          <option value="auto">Auto (Random)</option>
+          <option value="team1">Team 1</option>
+          <option value="team2">Team 2</option>
+        </select>
+
+        <label for="tossDecision">Toss Decision</label>
+        <select id="tossDecision">
+          <option value="bat">Bat First</option>
+          <option value="field">Field First</option>
+        </select>
+      </div>
+
+      <div class="sidebar-section">
+        <button class="btn btn-primary" id="simBtn" onclick="runSimulation()" style="margin-bottom:10px">
+          ▶&nbsp; Simulate Match
+        </button>
+        <button class="btn btn-secondary" onclick="resetAll()">↺&nbsp; Reset</button>
+      </div>
+
+      <!-- Player data load status -->
+      <div class="sidebar-section" style="padding:16px 24px">
+        <div id="dataStatus" class="data-status loading">⏳ Loading player data…</div>
+      </div>
+
+    </sidebar>
+
+    <!-- ── CONTENT ── -->
+    <div class="content" id="contentArea">
+
+      <!-- HOW TO PAGE -->
+      <div id="howtoPage" style="display:none">
+        <h2 class="page-title">How It Works</h2>
+        <div class="prose">
+          <p>IPL Sim is a cricket match simulator that uses real player statistics to simulate Twenty20 matches ball-by-ball. Every delivery is determined by a combination of batting ratings, bowling ratings, pitch conditions, match situation, and a touch of randomness.</p>
+          <h3>SIMULATION ENGINE</h3>
+          <p>Each ball resolves through a probability cascade: the engine first rolls for a wicket (scaled by bowler skill and pitch assist), then for a boundary (4 or 6), and finally a standard run (0–3). Phase multipliers shift these probabilities across powerplay, middle overs, and the death.</p>
+          <h3>PITCH CONDITIONS</h3>
+          <p>Green pitches boost pace/seam, dusty pitches assist spinners, dead tracks are batting paradises, and bouncy surfaces amplify pace. Dew in the second innings helps batters.</p>
+          <h3>COLLAPSE PROTECTION</h3>
+          <p>When multiple wickets fall quickly, the model dampens aggression to simulate the natural caution a new batsman applies — preventing unrealistic 10-wicket collapses in 3 overs.</p>
+          <h3>PLAYER DATA</h3>
+          <p>Ratings and strike rates are loaded live from <code>players.json</code> — the same data that powers your Discord bot. 267 players, real stats.</p>
+        </div>
+      </div>
+
+      <!-- SIM PAGE -->
+      <div id="simPage">
+
+        <!-- PRE-MATCH STATE -->
+        <div id="preMatch">
+          <div class="empty-state fade-up">
+            <div class="empty-icon">🏟️</div>
+            <div class="empty-title">Ready to Simulate</div>
+            <div class="empty-sub">Select two teams and a venue, configure conditions, then hit Simulate Match</div>
+          </div>
+        </div>
+
+        <!-- LIVE MATCH VIEW -->
+        <div id="liveMatchView" style="display:none">
+
+          <!-- Live score header -->
+          <div class="live-score-header" id="liveScoreHeader">
+            <div class="live-badge"><span class="live-dot"></span>LIVE</div>
+            <div class="live-match-title" id="liveMatchTitle">—</div>
+            <div class="live-inn-badge" id="liveInnBadge">1st Innings</div>
+          </div>
+
+          <!-- Main score -->
+          <div class="live-main-score-wrap">
+            <div class="live-team-score" id="liveTeamScore">
+              <div class="live-score-big" id="liveScoreBig">0/0</div>
+              <div class="live-score-meta" id="liveScoreMeta">0.0 overs</div>
+            </div>
+            <div class="live-target-wrap" id="liveTargetWrap" style="display:none">
+              <div class="live-target-label">TARGET</div>
+              <div class="live-target-num" id="liveTargetNum">—</div>
+              <div class="live-rrr" id="liveRRR">RRR —</div>
+            </div>
+          </div>
+
+          <!-- Current batsmen & bowler -->
+          <div class="live-players-row">
+            <!-- Striker -->
+            <div class="live-player-card striker" id="liveStriker">
+              <div class="live-player-label">🏏 STRIKER</div>
+              <div class="live-player-name" id="liveStrikerName">—</div>
+              <div class="live-player-stats" id="liveStrikerStats">0 (0)</div>
+              <div class="live-player-sr" id="liveStrikerSR">SR —</div>
+            </div>
+            <!-- Non-striker -->
+            <div class="live-player-card non-striker" id="liveNonStriker">
+              <div class="live-player-label">NON-STRIKER</div>
+              <div class="live-player-name" id="liveNonStrikerName">—</div>
+              <div class="live-player-stats" id="liveNonStrikerStats">0 (0)</div>
+              <div class="live-player-sr" id="liveNonStrikerSR">SR —</div>
+            </div>
+            <!-- Bowler -->
+            <div class="live-player-card bowler" id="liveBowlerCard">
+              <div class="live-player-label">⚡ BOWLING</div>
+              <div class="live-player-name" id="liveBowlerName">—</div>
+              <div class="live-player-stats" id="liveBowlerStats">0-0 (0)</div>
+              <div class="live-player-sr" id="liveBowlerEco">Eco —</div>
+            </div>
+          </div>
+
+          <!-- Current over balls -->
+          <div class="live-over-wrap">
+            <div class="live-over-label" id="liveOverLabel">THIS OVER</div>
+            <div class="live-balls-row" id="liveCurrentOverBalls"></div>
+            <div class="live-over-runs" id="liveOverRuns">0 runs this over</div>
+          </div>
+
+          <!-- Last ball event flash -->
+          <div class="live-event-flash" id="liveEventFlash"></div>
+
+          <!-- Recent overs log -->
+          <div class="live-recent-overs" id="liveRecentOvers">
+            <div class="live-section-label">RECENT OVERS</div>
+            <div id="liveOversLog"></div>
+          </div>
+
+          <!-- Control bar -->
+          <div class="live-controls">
+            <button class="btn btn-danger" id="liveStopBtn" onclick="stopLive()" style="width:auto;padding:10px 28px">
+              ⏹ Stop
+            </button>
+            <div class="live-controls-info" id="liveControlsInfo">Simulating…</div>
+          </div>
+
+        </div><!-- /liveMatchView -->
+
+        <!-- MATCH VIEW -->
+        <div id="matchView" style="display:none">
+
+          <!-- RESULT BANNER -->
+          <div class="result-banner" id="resultBanner">
+            <div class="result-emoji">🏆</div>
+            <div class="result-title" id="resultTitle">Team Wins!</div>
+            <div class="result-subtitle" id="resultSubtitle"></div>
+          </div>
+
+          <!-- VENUE INFO -->
+          <div class="venue-hero fade-up" id="venueDisplay">
+            <div class="venue-top">
+              <div>
+                <div class="venue-label">Venue</div>
+                <div class="venue-name" id="venueName">—</div>
+              </div>
+              <div class="stat-chips" id="pitchChips"></div>
+            </div>
+            <div class="toss-display show" id="tossDisplay"></div>
+          </div>
+
+          <!-- TABS -->
+          <div class="tab-bar">
+            <button class="tab active" onclick="switchTab('scorecard')">Scorecard</button>
+            <button class="tab" onclick="switchTab('balllog')">Ball Log</button>
+            <button class="tab" onclick="switchTab('stats')">Stats</button>
+          </div>
+
+          <!-- SCORECARD TAB -->
+          <div class="tab-panel active" id="scorecard-panel">
+            <div class="inn-btns">
+              <button class="btn btn-primary" id="inn1Btn" onclick="showInnings(1)">1st Innings</button>
+              <button class="btn btn-secondary" id="inn2Btn" onclick="showInnings(2)">2nd Innings</button>
+            </div>
+            <div class="innings-row">
+              <div class="innings-card active" id="inn1Card">
+                <div class="innings-label">1st Innings</div>
+                <div class="innings-score" id="inn1Score">—</div>
+                <div class="innings-overs" id="inn1Overs">— overs</div>
+              </div>
+              <div class="innings-card" id="inn2Card">
+                <div class="innings-label">2nd Innings</div>
+                <div class="innings-score" id="inn2Score">—</div>
+                <div class="innings-overs" id="inn2Overs">— overs</div>
+              </div>
+            </div>
+
+            <div class="scorecard" id="battingCard">
+              <div class="scorecard-header">
+                <div class="dot"></div>
+                <span id="battingTeamLabel">Batting</span>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Batsman</th>
+                    <th class="right">R</th>
+                    <th class="right">B</th>
+                    <th class="right">4s</th>
+                    <th class="right">6s</th>
+                    <th class="right">SR</th>
+                  </tr>
+                </thead>
+                <tbody id="battingTbody"></tbody>
+              </table>
+            </div>
+
+            <div class="scorecard" id="bowlingCard">
+              <div class="scorecard-header">
+                <div class="dot" style="background:var(--accent2)"></div>
+                <span id="bowlingTeamLabel">Bowling</span>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Bowler</th>
+                    <th class="right">O</th>
+                    <th class="right">R</th>
+                    <th class="right">W</th>
+                    <th class="right">Eco</th>
+                  </tr>
+                </thead>
+                <tbody id="bowlingTbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- BALL LOG TAB -->
+          <div class="tab-panel" id="balllog-panel">
+            <div class="inn-btns">
+              <button class="btn btn-primary" id="log1Btn" onclick="showLog(1)">1st Innings</button>
+              <button class="btn btn-secondary" id="log2Btn" onclick="showLog(2)">2nd Innings</button>
+            </div>
+            <div class="ball-log-wrap" id="ballLogContainer"></div>
+          </div>
+
+          <!-- STATS TAB -->
+          <div class="tab-panel" id="stats-panel">
+            <div class="stats-grid" id="statsGrid"></div>
+          </div>
+
+        </div><!-- /matchView -->
+      </div><!-- /simPage -->
+    </div><!-- /content -->
+
+  </main>
+</div><!-- /wrap -->
+
+<div id="dashOverlay" class="dash-overlay" onclick="toggleDashboard()"></div>
+
+<div id="slideDashboard" class="slide-dashboard">
+  <div class="dash-header">
+    <h2>🏆 Tournament Dashboard</h2>
+    <button class="close-btn" onclick="toggleDashboard()">✕</button>
+  </div>
+
+  <div class="tab-bar dash-tabs">
+    <button class="tab dash-tab active" onclick="switchDashTab('dash-history')">History</button>
+    <button class="tab dash-tab" onclick="switchDashTab('dash-points')">Points Table</button>
+    <button class="tab dash-tab" onclick="switchDashTab('dash-teams')">Teams & Players</button>
+    <button class="tab dash-tab" onclick="switchDashTab('dash-stats')">Stats</button>
+  </div>
+
+  <div class="dash-content">
+    <div id="dash-teams-panel" class="dash-panel" style="display:none;">
+      <div class="dash-header-row">
+        <div class="pts-title">TOURNAMENT ROSTERS</div>
+      </div>
+      <div id="teamsGridContainer" class="dash-teams-grid"></div>
+      <div id="teamRosterContainer" style="display:none;"></div>
+    </div>
+
+    <div class="dash-content">
+      <div id="dash-history-panel" class="dash-panel active">
+        <div class="dash-header-row">
+          <div style="font-family:'Space Mono'; color:var(--muted); font-size:0.8rem;" id="dashMatchCount">0 matches</div>
+          <div data-master-only>
+            <button class="btn btn-secondary dash-action-btn" onclick="clearMatchLog()">Clear All</button>
+          </div>
+        </div>
+        <div id="dashEmptyState" class="empty-state" style="display:none">
+          <div class="empty-icon">📊</div>
+          <div class="empty-title">No Matches Yet</div>
+          <div class="empty-sub">Simulate a match to see history and stats here.</div>
+        </div>
+        <div id="dashContent" style="display:none;">
+          <div id="matchHistoryList"></div>
+        </div>
+      </div>
+
+      <!-- ── POINTS TABLE PANEL ── -->
+      <div id="dash-points-panel" class="dash-panel" style="display:none;">
+        <div class="pts-header-row">
+          <div class="pts-title">POINTS TABLE</div>
+          <div class="pts-subtitle" id="ptsSubtitle">Based on simulated matches</div>
+        </div>
+        <div id="pointsTableEmpty" class="dash-empty" style="display:none;">
+          <div class="dash-empty-icon">🏆</div>
+          <div class="dash-empty-title">No Matches Yet</div>
+          <div class="dash-empty-sub">Simulate matches between teams to build the points table.</div>
+        </div>
+        <div id="pointsTableWrap">
+          <table class="pts-table" id="pointsTable">
+            <thead>
+              <tr>
+                <th class="pts-th pts-th-rank">#</th>
+                <th class="pts-th pts-th-team">Team</th>
+                <th class="pts-th pts-th-num">M</th>
+                <th class="pts-th pts-th-num">W</th>
+                <th class="pts-th pts-th-num">L</th>
+                <th class="pts-th pts-th-num">D</th>
+                <th class="pts-th pts-th-num pts-pts-col">PTS</th>
+                <th class="pts-th pts-th-nrr">NRR</th>
+              </tr>
+            </thead>
+            <tbody id="pointsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="dash-stats-panel" class="dash-panel" style="display:none;">
+        <div class="caps-col">
+          <div class="cap-card orange-cap-card">
+            <div class="cap-ambient orange-ambient"></div>
+            <div class="cap-inner">
+              <div class="cap-icon-wrap orange-icon-wrap"><div class="cap-icon">🧢</div></div>
+              <div class="cap-label-tag orange-tag">ORANGE CAP</div>
+              <div class="cap-subtitle">MOST RUNS</div>
+              <div class="cap-player-name" id="ocPlayerName">—</div>
+              <div class="cap-stat-big orange-stat" id="ocRuns">0</div>
+              <div class="cap-stat-meta" id="ocMeta">—</div>
+              <div class="cap-divider orange-divider"></div>
+              <div class="cap-leaderboard" id="ocLeaderboard"></div>
+            </div>
+          </div>
+
+          <div class="cap-card purple-cap-card">
+            <div class="cap-ambient purple-ambient"></div>
+            <div class="cap-inner">
+              <div class="cap-icon-wrap purple-icon-wrap"><div class="cap-icon">🧢</div></div>
+              <div class="cap-label-tag purple-tag">PURPLE CAP</div>
+              <div class="cap-subtitle">MOST WICKETS</div>
+              <div class="cap-player-name" id="pcPlayerName">—</div>
+              <div class="cap-stat-big purple-stat" id="pcWickets">0</div>
+              <div class="cap-stat-meta" id="pcMeta">—</div>
+              <div class="cap-divider purple-divider"></div>
+              <div class="cap-leaderboard" id="pcLeaderboard"></div>
+            </div>
+          </div>
+
+          <div class="cap-card cyan-cap-card">
+            <div class="cap-ambient cyan-ambient"></div>
+            <div class="cap-inner">
+              <div class="cap-icon-wrap cyan-icon-wrap"><div class="cap-icon">⚡</div></div>
+              <div class="cap-label-tag cyan-tag">SUPER STRIKER</div>
+              <div class="cap-subtitle">HIGHEST STRIKE RATE</div>
+              <div class="cap-player-name" id="ssPlayerName">—</div>
+              <div class="cap-stat-big cyan-stat" id="ssStrikeRate">0.0</div>
+              <div class="cap-stat-meta" id="ssMeta">Min 15 balls faced</div>
+              <div class="cap-divider cyan-divider"></div>
+              <div class="cap-leaderboard" id="ssLeaderboard"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="bowlingModalOverlay" class="dash-overlay" onclick="closeBowlingModal()"></div>
+<div id="bowlingModal" class="modal">
+  <div class="modal-header">
+    <h2 style="font-family:'Bebas Neue'; letter-spacing:2px; margin:0; color:var(--text);">Set Bowling Orders</h2>
+    <button class="close-btn" onclick="closeBowlingModal()">✕</button>
+  </div>
+  <div class="modal-body">
+    <div id="t1BowlSetup"></div>
+    <div id="t2BowlSetup"></div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" style="width:auto;" onclick="saveBowlingModal()">Save Orders</button>
+  </div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loadingText">Simulating Match…</div>
+</div>
+
+</div><!-- /appWrapper -->
+
+<script src="app.js"></script>
+<script src="auth.js"></script>
+</body>
+</html>
