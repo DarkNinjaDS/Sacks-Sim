@@ -1638,15 +1638,14 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+// Declare memoryLog EXACTLY once to prevent fatal crashes
 let memoryLog = []; 
 
 // 1. Real-time Listener: Magically updates the app when anyone plays a match
 db.ref('matches').on('value', (snapshot) => {
   const data = snapshot.val();
-  // Convert Firebase object back into an array
   memoryLog = data ? Object.values(data) : [];
   
-  // If the dashboard is currently open on someone's screen, refresh it live!
   const dash = document.getElementById('slideDashboard');
   if (dash && dash.classList.contains('open')) {
     renderDashboard();
@@ -1662,7 +1661,6 @@ function saveMatchToLog(data) {
     data.id = Date.now();
     data.date = new Date().toISOString();
   }
-  // Push directly to Firebase. The listener above will instantly update memoryLog.
   db.ref('matches/' + data.id).set(data);
 }
 
@@ -1999,6 +1997,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   await loadPlayerData();
   document.getElementById('team1Select').addEventListener('change', () => { customBowlingOrders.t1 = []; });
   document.getElementById('team2Select').addEventListener('change', () => { customBowlingOrders.t2 = []; });
+  
   // Show/hide speed selector when live toggle is flipped
   document.getElementById('liveToggle').addEventListener('click', () => {
     setTimeout(() => {
@@ -2006,6 +2005,6 @@ window.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('liveSpeedRow').style.display = on ? 'block' : 'none';
     }, 0);
   });
-
 });
+
 
