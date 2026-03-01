@@ -1622,44 +1622,62 @@ function renderPointsTable() {
 
 let memoryLog = []; // Bulletproof fallback for browser restrictions
 
-function getMatchLog() {
-  try {
-    const log = localStorage.getItem('iplSimLog');
-    return log ? JSON.parse(log) : memoryLog;
-  } catch(e) {
-    return memoryLog; // Use fallback if browser blocks storage
+// ===================================================
+//   FIREBASE DATABASE SETUP
+// ===================================================
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCjnLPBSCF9QN62qiB4zgppuqTHhCiSbog",
+  authDomain: "sacks-sim.firebaseapp.com",
+  databaseURL: "https://sacks-sim-default-rtdb.firebaseio.com",
+  projectId: "sacks-sim",
+  storageBucket: "sacks-sim.firebasestorage.app",
+  messagingSenderId: "177965098130",
+  appId: "1:177965098130:web:18aa2118896ffb9b77b24b",
+  measurementId: "G-MWJRX7DZC4"
+};
+
+// Initialize Firebase (Compat Version)
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let memoryLog = []; 
+
+// 1. Real-time Listener: Magically updates the app when anyone plays a match
+db.ref('matches').on('value', (snapshot) => {
+  const data = snapshot.val();
+  // Convert Firebase object back into an array
+  memoryLog = data ? Object.values(data) : [];
+  
+  // If the dashboard is currently open on someone's screen, refresh it live!
+  const dash = document.getElementById('slideDashboard');
+  if (dash && dash.classList.contains('open')) {
+    renderDashboard();
   }
+});
+
+function getMatchLog() {
+  return memoryLog;
 }
 
 function saveMatchToLog(data) {
-  const log = getMatchLog();
   if (!data.id) {
     data.id = Date.now();
     data.date = new Date().toISOString();
   }
-  log.push(data);
-  memoryLog = log; // Update fallback
-  try {
-    localStorage.setItem('iplSimLog', JSON.stringify(log));
-  } catch(e) {
-    console.warn("Browser blocked save. Match saved to memory instead.");
-  }
+  // Push directly to Firebase. The listener above will instantly update memoryLog.
+  db.ref('matches/' + data.id).set(data);
 }
 
 function clearMatchLog() {
-  // Bypassing browser 'confirm' popups to ensure it always fires
-  try { localStorage.removeItem('iplSimLog'); } catch(e) {}
-  memoryLog = [];
-  renderDashboard(); // Instantly clears the screen
+  db.ref('matches').remove();
+  renderDashboard();
 }
 
 function deleteMatch(id, event) {
-  event.stopPropagation(); // Prevents opening the match when clicking X
-  let log = getMatchLog();
-  log = log.filter(m => m.id !== id);
-  memoryLog = log;
-  try { localStorage.setItem('iplSimLog', JSON.stringify(log)); } catch(e) {}
-  renderDashboard(); // Instantly refreshes the screen
+  if (event) event.stopPropagation(); 
+  db.ref('matches/' + id).remove();
+  renderDashboard(); 
 }
 
 function loadHistoricalMatch(id) {
@@ -1991,4 +2009,5 @@ window.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('liveSpeedRow').style.display = on ? 'block' : 'none';
     }, 0);
   });
+
 });
