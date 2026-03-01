@@ -10,7 +10,7 @@
 const USERS = {
   aqua:   { password: 'aqua18',   access: 'master', team: 'aqua',   displayName: 'Aqua' },
   anuj:   { password: 'lenda45',   access: 'master', team: 'anuj',   displayName: 'Anuj' },
-  pranav: { password: 'pranav123', access: 'master', team: null,     displayName: 'Pranav' },
+  pranav: { password: 'agenda_merchant', access: 'master', team: null,     displayName: 'Pranav' },
   bhukla: { password: 'bhukla123', access: 'player', team: 'bhukla', displayName: 'Bhukla' },
   patake: { password: 'patake123', access: 'player', team: 'patake', displayName: 'Patake' },
 };
@@ -304,3 +304,4 @@ function initAuth() {
 // Run auth init after DOM is ready
 
 document.addEventListener('DOMContentLoaded', initAuth);
+
