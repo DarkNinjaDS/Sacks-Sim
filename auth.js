@@ -8,7 +8,7 @@
 // ===================================================
 
 const USERS = {
-  aqua:   { password: 'aqua123',   access: 'master', team: 'aqua',   displayName: 'Aqua' },
+  aqua:   { password: 'aqua18',   access: 'master', team: 'aqua',   displayName: 'Aqua' },
   anuj:   { password: 'lenda45',   access: 'master', team: 'anuj',   displayName: 'Anuj' },
   pranav: { password: 'pranav123', access: 'master', team: null,     displayName: 'Pranav' },
   bhukla: { password: 'bhukla123', access: 'player', team: 'bhukla', displayName: 'Bhukla' },
@@ -302,4 +302,5 @@ function initAuth() {
 }
 
 // Run auth init after DOM is ready
+
 document.addEventListener('DOMContentLoaded', initAuth);
