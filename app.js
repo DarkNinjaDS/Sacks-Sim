@@ -1618,9 +1618,6 @@ function renderPointsTable() {
   }).join('');
 }
 
-// ===================================================
-
-let memoryLog = []; // Bulletproof fallback for browser restrictions
 
 // ===================================================
 //   FIREBASE DATABASE SETUP
@@ -2011,3 +2008,4 @@ window.addEventListener('DOMContentLoaded', async () => {
   });
 
 });
+
