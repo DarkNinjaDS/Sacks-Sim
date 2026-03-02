@@ -333,7 +333,7 @@
     "name": "Heinrich Klaasen",
     "team": "aqua",
     "role": "batsman",
-    "bat_subtype": "basher",
+    "bat_subtype": "switcher",
     "bowl_subtype": null,
     "bat_rating": 89,
     "bowl_rating": 0,
@@ -659,4 +659,5 @@
     "strike_rate": 0,
     "bowl_style": "Right-arm Fast"
   }
+
 }
