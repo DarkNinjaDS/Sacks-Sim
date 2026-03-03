@@ -360,6 +360,10 @@
 
       <!-- Player Team Management Section (player-level only) -->
       <div id="playerTeamSection"></div>
+      <div class="sidebar-section" data-master-only>
+        <div class="sidebar-title">Master Controls</div>
+        <button class="btn btn-secondary" onclick="openMasterTeamModal()">⚙️ Manage All Playing XIs</button>
+      </div>
 
       <div class="sidebar-section">
         <div class="sidebar-title">Match Setup</div>
@@ -812,6 +816,27 @@
   </div>
 </div>
 
+<div id="masterTeamModalOverlay" class="dash-overlay" onclick="closeMasterTeamModal()"></div>
+<div id="masterTeamModal" class="modal">
+  <div class="modal-header">
+    <h2 style="font-family:'Bebas Neue'; letter-spacing:2px; margin:0; color:var(--accent);">Manage Playing XIs</h2>
+    <button class="close-btn" onclick="closeMasterTeamModal()">✕</button>
+  </div>
+  <div class="modal-body">
+    <div style="margin-bottom:15px;">
+      <label style="font-family:'Space Mono', monospace; font-size:0.7rem; color:var(--muted); text-transform:uppercase;">Select Team to Edit</label>
+      <select id="masterTeamSelect" class="xi-select" style="width:100%; margin-top:5px;" onchange="renderMasterTeamEditor()">
+        <option value="">— Select a Team —</option>
+      </select>
+    </div>
+    <div id="masterTeamEditorList" class="playing-xi-list"></div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" style="width:auto;" onclick="saveMasterTeamXi()">Save XI</button>
+    <span id="masterXiSaveMsg" style="display:none; margin-left:15px; font-family:'Space Mono', monospace; font-size:0.8rem; color:var(--accent3);">✓ Saved!</span>
+  </div>
+</div>
+
 <!-- LOADING OVERLAY -->
 <div id="loading">
   <div class="spinner"></div>
@@ -826,5 +851,6 @@
 <script src="auth.js"></script>
 </body>
 </html>
+
 
 
