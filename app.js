@@ -1989,6 +1989,91 @@ function buildPlayer(d) {
 }
 
 // ===================================================
+//   MASTER TEAM MANAGEMENT
+// ===================================================
+
+function openMasterTeamModal() {
+  const select = document.getElementById('masterTeamSelect');
+  // Populate the team dropdown dynamically
+  select.innerHTML = '<option value="">— Select a Team —</option>';
+  Object.entries(TEAM_DISPLAY).forEach(([key, name]) => {
+    select.innerHTML += `<option value="${key}">${name}</option>`;
+  });
+  
+  document.getElementById('masterTeamEditorList').innerHTML = '';
+  document.getElementById('masterTeamModalOverlay').classList.add('show');
+  document.getElementById('masterTeamModal').style.display = 'block';
+}
+
+function closeMasterTeamModal() {
+  document.getElementById('masterTeamModalOverlay').classList.remove('show');
+  document.getElementById('masterTeamModal').style.display = 'none';
+}
+
+function renderMasterTeamEditor() {
+  const teamKey = document.getElementById('masterTeamSelect').value;
+  const list = document.getElementById('masterTeamEditorList');
+  
+  if (!teamKey) {
+    list.innerHTML = '';
+    return;
+  }
+
+  const roster = TEAM_ROSTERS[teamKey] || [];
+  const allPlayers = Object.keys(PLAYER_DB).sort();
+
+  list.innerHTML = '';
+  // Ensure we have 11 slots to fill
+  const slots = Array.from({ length: 11 }, (_, i) => roster[i] || '');
+
+  slots.forEach((player, i) => {
+    const row = document.createElement('div');
+    row.className = 'xi-slot';
+    row.innerHTML = `
+      <span class="xi-num">${i + 1}</span>
+      <select class="xi-select" id="masterXiSlot_${i}">
+        <option value="">— Select Player —</option>
+        ${allPlayers.map(p => `<option value="${p}" ${p === player ? 'selected' : ''}>${p}</option>`).join('')}
+      </select>
+    `;
+    list.appendChild(row);
+  });
+}
+
+function saveMasterTeamXi() {
+  const teamKey = document.getElementById('masterTeamSelect').value;
+  if (!teamKey) {
+    alert("Please select a team first.");
+    return;
+  }
+
+  const newXi = [];
+  for (let i = 0; i < 11; i++) {
+    const sel = document.getElementById(`masterXiSlot_${i}`);
+    if (sel && sel.value) newXi.push(sel.value);
+    else newXi.push('');
+  }
+
+  const filled = newXi.filter(Boolean);
+  if (filled.length < 11) {
+    const missing = 11 - filled.length;
+    if (!confirm(`This team has ${missing} empty slot(s). Save anyway?`)) return;
+  }
+
+  // Update the global roster memory
+  TEAM_ROSTERS[teamKey] = newXi.filter(Boolean);
+
+  // Show the green checkmark message
+  const msg = document.getElementById('masterXiSaveMsg');
+  if (msg) {
+    msg.style.display = 'inline-block';
+    setTimeout(() => { msg.style.display = 'none'; }, 2500);
+  }
+  
+  console.log(`[AUTH] Master updated ${teamKey} Playing XI:`, TEAM_ROSTERS[teamKey]);
+}
+
+// ===================================================
 //   INIT
 // ===================================================
 
@@ -2006,5 +2091,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     }, 0);
   });
 });
+
 
 
