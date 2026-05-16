@@ -456,6 +456,22 @@ function savePlayingXi() {
 
   console.log(`[AUTH] ${currentUser.displayName} updated & saved ${normalizedKey} Playing XI.`);
 }
+  // NEW: Save the updated rosters globally to localStorage
+  try {
+    localStorage.setItem('sackssim_rosters', JSON.stringify(TEAM_ROSTERS));
+  } catch (e) {
+    console.warn("Browser blocked saving to localStorage", e);
+  }
+
+  // Show save message
+  const msg = document.getElementById('xiSaveMsg');
+  if (msg) {
+    msg.style.display = 'block';
+    setTimeout(() => { msg.style.display = 'none'; }, 2500);
+  }
+
+  console.log(`[AUTH] ${currentUser.displayName} updated & saved ${normalizedKey} Playing XI.`);
+}
 
 // ===================================================
 //   INIT
