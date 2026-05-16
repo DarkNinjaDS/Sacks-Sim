@@ -23,18 +23,28 @@ let currentUser = null;
 // ===================================================
 
 function saveSession(user) {
-  sessionStorage.setItem('sackssim_user', JSON.stringify(user));
+  try {
+    sessionStorage.setItem('sackssim_user', JSON.stringify(user));
+  } catch (e) {
+    console.warn("Session storage is blocked. Login will not persist on reload.");
+  }
 }
 
 function loadSession() {
   try {
     const data = sessionStorage.getItem('sackssim_user');
     return data ? JSON.parse(data) : null;
-  } catch { return null; }
+  } catch (e) { 
+    return null; 
+  }
 }
 
 function clearSession() {
-  sessionStorage.removeItem('sackssim_user');
+  try {
+    sessionStorage.removeItem('sackssim_user');
+  } catch (e) {
+    // Ignore error
+  }
 }
 
 // ===================================================
