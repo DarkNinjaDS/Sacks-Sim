@@ -157,12 +157,6 @@ function applyAccessRestrictions() {
   }
 
   // Sidebar: hide sim controls for players but show team management
-  const bowlBtn = document.querySelector('[onclick="openBowlingModal()"]');
-  if (bowlBtn && !isMaster) {
-    bowlBtn.style.opacity = '0.4';
-    bowlBtn.style.pointerEvents = 'none';
-    bowlBtn.title = 'Only master users can set bowling orders';
-  }
 
   // Show "My Team" section for players
   if (!isMaster && currentUser.team) {
@@ -447,7 +441,7 @@ function savePlayingXi() {
   }
 
   // Save selection using the user's direct team key
-  TEAM_ROSTERS[teamKey] = [..._xiCurrentOrder];
+  TEAM_ROSTERS[teamKey] = [..._xiCurrentOrder, ..._xiBench];
 
   // Save the updated rosters globally to localStorage
   try {
