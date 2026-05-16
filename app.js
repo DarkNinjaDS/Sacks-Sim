@@ -75,15 +75,6 @@ const STADIUMS = {
 
 // Pre-defined 11-player rosters (keys must match PLAYER_DB names)
 const TEAM_ROSTERS = {
-   // Load custom saved rosters from localStorage on reload
-try {
-  const savedRosters = JSON.parse(localStorage.getItem('sackssim_rosters'));
-  if (savedRosters) {
-    Object.assign(TEAM_ROSTERS, savedRosters);
-  }
-} catch (e) {
-  console.warn("Could not load custom rosters", e);
-  }
     // Group A
     "aqua": [
         "Travis Head", "Abhishek Sharma", "Heinrich Klaasen", "Nicholas Pooran", "Mitchell Marsh",
@@ -194,6 +185,16 @@ try {
         "Morne Morkel", "David Warner", "Marcus Stoinis", "Kuldeep Yadav", "Ashish Nehra"
     ]
 };
+
+// Load custom saved rosters from localStorage on reload
+try {
+  const savedRosters = JSON.parse(localStorage.getItem('sackssim_rosters'));
+  if (savedRosters) {
+    Object.assign(TEAM_ROSTERS, savedRosters);
+  }
+} catch (e) {
+  console.warn("Could not load custom rosters", e);
+}
 
 // ===================================================
 //   PLAYER DATABASE  (populated by fetch)
