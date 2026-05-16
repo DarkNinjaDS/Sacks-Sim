@@ -7,50 +7,53 @@
 // ===================================================
 
 const TEAM_COLORS = {
-    "Patake XI": "#2a1b54",
-    "Aqua": "#00b4d8",
-    "Pranav": "#1d54aa",
-    "Anuj": "#8f97a1",
-    "Om": "#a52a2a",
-    "MI All Time": "#004ba0",
-    "CSK All Time": "#f9cd05",
-    "RCB All Time": "#e21e26",
-    "KKR All Time": "#3a225d",
-    "RR All Time": "#ea1a85",
-    "Hyderabad All Time": "#f26522",
-    "Delhi All Time": "#004c93",
-    "Punjab All Time": "#ed1b24",
-    "Australia": "#ffcd00",
-    "England": "#152a55",
-    "South Africa": "#007a4d",
-    "New Zealand": "#111111",
-    "India": "#005cb9",
-    "The Hundred": "#00e676",
-    "SA 20": "#00a3e0"
+  anuj: '#c4c4c4', aqua: '#00adbf', patake: '#281c6c',
+  pranav: '#1d54aa', indiamasters: '#00008b', worldteststars: '#dcdcdc',
+  wpl: '#ff69b4', psl: '#006400', cpl: '#800080',
+  bblxi: '#323232', eclxi: '#8b0000', bhukla: '#a52a2a',
+  u19: '#add8e6', worldmasters: '#daa520', scoutxi: '#228b22',
+  soldxi: '#4b0082', prisonxi: '#808080', undraftedxi: '#708090',
+  unsoldxi: '#c0c0c0', psk: '#cccc00',
+  // Group teams
+  southafrica: '#007a4d', rcbat: '#e01f2b', thehundred: '#00b2a9',
+  australia:   '#f9be00', miat:   '#004c93', hydat:      '#f26522',
+  spdoxxers:   '#6a0dad', newzealand: '#555555', kkrat: '#3a225d', sa20: '#ef3340',
+  asadlahori:  '#006400', england: '#00247d', rrat: '#ea1e8c', punat: '#d71921',
+  agendadoval: '#ff6600', india: '#1a237e', cskat: '#f7a721', delat: '#3d5afe',
 };
 
 const TEAM_DISPLAY = {
-    "Patake XI": "Patake",
-    "Aqua": "Aqua",
-    "Pranav": "Pranav",
-    "Anuj": "Anuj",
-    "Om": "Bhukla", 
-    "MI All Time": "MI",
-    "CSK All Time": "CSK",
-    "RCB All Time": "RCB",
-    "KKR All Time": "KKR",
-    "RR All Time": "RR",
-    "Hyderabad All Time": "Hyderabad",
-    "Delhi All Time": "Delhi",
-    "Punjab All Time": "Punjab",
-    "Australia": "Australia",
-    "England": "England",
-    "South Africa": "South Africa",
-    "New Zealand": "New Zealand",
-    "India": "India",
-    "The Hundred": "The Hundred",
-    "SA 20": "SA20"
+  anuj: 'Anuj XI', aqua: 'Aqua Rehman Bangal', bhukla: 'Major Bhukla', patake: 'Patake XI',
+  // Group A
+  southafrica: 'South Africa', rcbat: 'RCB AT', thehundred: 'The Hundred',
+  // Group B
+  australia: 'Australia', miat: 'MI AT', hydat: 'HYD AT',
+  // Group C
+  spdoxxers: 'SP Doxxers', newzealand: 'New Zealand', kkrat: 'KKR AT', sa20: 'SA20',
+  // Group D
+  asadlahori: 'Asad Lahori', england: 'England', rrat: 'RR AT', punat: 'PUN AT',
+  // Group E
+  agendadoval: 'Agenda Doval', india: 'India', cskat: 'CSK AT', delat: 'DEL AT',
 };
+
+// ===================================================
+//   TOURNAMENT GROUPS
+//   Maps group labels → array of team keys
+// ===================================================
+
+const TOURNAMENT_GROUPS = {
+  'Group A': ['aqua', 'southafrica', 'rcbat', 'thehundred'],
+  'Group B': ['bhukla', 'australia', 'miat', 'hydat'],
+  'Group C': ['spdoxxers', 'newzealand', 'kkrat', 'sa20'],
+  'Group D': ['asadlahori', 'england', 'rrat', 'punat'],
+  'Group E': ['agendadoval', 'india', 'cskat', 'delat'],
+};
+
+// Reverse map: team key → group name
+const TEAM_TO_GROUP = {};
+Object.entries(TOURNAMENT_GROUPS).forEach(([group, teams]) => {
+  teams.forEach(t => { TEAM_TO_GROUP[t] = group; });
+});
 
 const STADIUMS = {
   'MCG, Melbourne':              { pace:1.1, spin:0.9, outfield:1.0, dew:0.10, pitch:'balanced' },
@@ -75,346 +78,58 @@ const STADIUMS = {
 
 // Pre-defined 11-player rosters (keys must match PLAYER_DB names)
 const TEAM_ROSTERS = {
-    "Patake XI": [
-        "Tim Seifert",
-        "Shubman Gill",
-        "Sai Sudarshan",
-        "Jos Buttler",
-        "Cameron Green",
-        "Rinku Singh",
-        "Sunil Narine",
-        "Rashid Khan",
-        "Jason Holder",
-        "Varun Chakravarthy",
-        "Matheesha Pathirana",
-        "Mohammad Siraj",
-        "Finn Allen",
-        "Kagiso Rabada",
-        "Harshit Rana"
-    ],
-    "MI All Time": [
-        "Rohit Sharma",
-        "Quinton de Kock",
-        "Suryakumar Yadav",
-        "Ishan Kishan",
-        "Hardik Pandya",
-        "Kieron Pollard",
-        "Krunal Pandya",
-        "Harbhajan Singh",
-        "Trent Boult",
-        "Jasprit Bumrah",
-        "Lasith Malinga",
-        "Sachin Tendulkar",
-        "Tilak Varma",
-        "Rahul Chahar",
-        "Mitchell McClenaghan"
-    ],
-    "Australia": [
-        "Travis Head",
-        "Mitchell Marsh",
-        "Josh Inglis",
-        "Cameron Green",
-        "Tim David",
-        "Marcus Stoinis",
-        "Glenn Maxwell",
-        "Ben Dwarshuis",
-        "Nathan Ellis",
-        "Xavier Bartlett",
-        "Adam Zampa",
-        "Matt Renshaw",
-        "Cooper Connolly",
-        "Matthew Kuhnemann",
-        "Steve Smith"
-    ],
-    "Pranav": [
-        "KL Rahul",
-        "Pathum Nissanka",
-        "Prabhsimran Singh",
-        "Shreyas Iyer",
-        "Cooper Connolly",
-        "Shashank Singh",
-        "David Miller",
-        "Tristan Stubbs",
-        "Marcus Stoinis",
-        "Axar Patel",
-        "Ben Dwarshuis",
-        "Arshdeep Singh",
-        "T Natarajan",
-        "Kuldeep Yadav",
-        "Yuzvendra Chahal"
-    ],
-    "RCB All Time": [
-        "Virat Kohli",
-        "Chris Gayle",
-        "Devdutt Padikkal",
-        "AB de Villiers",
-        "Glenn Maxwell",
-        "Dinesh Karthik",
-        "Jitesh Sharma",
-        "Harshal Patel",
-        "Anil Kumble",
-        "Josh Hazlewood",
-        "Yuzvendra Chahal",
-        "Faf du Plessis",
-        "Rajat Patidar",
-        "Wanindu Hasaranga",
-        "Mohammed Siraj"
-    ],
-    "England": [
-        "Phil Salt",
-        "Ben Duckett",
-        "Jos Buttler",
-        "Tom Banton",
-        "Harry Brook",
-        "Will Jacks",
-        "Sam Curran",
-        "Liam Dawson",
-        "Jofra Archer",
-        "Adil Rashid",
-        "Luke Wood",
-        "Jacob Bethell",
-        "Jamie Overton",
-        "Rehan Ahmed",
-        "Josh Tongue"
-    ],
-    "Anuj": [
-        "Yashasvi Jaiswal",
-        "Ryan Rickelton",
-        "Will Jacks",
-        "Suryakumar Yadav",
-        "Tilak Verma",
-        "Riyan Parag",
-        "Shimron Hetmyer",
-        "Donovan Ferreria",
-        "Hardik Pandya",
-        "Ravindra Jadeja",
-        "Mitchell Santner",
-        "Jasprit Bumrah",
-        "Trent Boult",
-        "Tushar Deshpande",
-        "Ravi Bishnoi"
-    ],
-    "CSK All Time": [
-        "Faf du Plessis",
-        "Ruturaj Gaikwad",
-        "Suresh Raina",
-        "Ambati Rayudu",
-        "MS Dhoni",
-        "Ravindra Jadeja",
-        "Albie Morkel",
-        "Dwayne Bravo",
-        "Ravichandran Ashwin",
-        "Deepak Chahar",
-        "Mohit Sharma",
-        "Shane Watson",
-        "Shivam Dube",
-        "Imran Tahir",
-        "Matheesha Pathirana"
-    ],
-    "South Africa": [
-        "Aiden Markram",
-        "Quinton de Kock",
-        "Ryan Rickelton",
-        "Dewald Brevis",
-        "Tristan Stubbs",
-        "David Miller",
-        "Marco Jansen",
-        "George Linde",
-        "Keshav Maharaj",
-        "Kagiso Rabada",
-        "Anrich Nortje",
-        "Jason Smith",
-        "Corbin Bosch",
-        "Kwena Maphaka",
-        "Lungi Ngidi"
-    ],
-    "Aqua": [
-        "Travis Head",
-        "Abhishek Sharma",
-        "Heinrich Klaasen",
-        "Nicholas Pooran",
-        "Mitchell Marsh",
-        "Rishabh Pant",
-        "Wanindu Hasaranga",
-        "Harshal Patel",
-        "Mohammad Shami",
-        "Pat Cummins",
-        "Avesh Khan",
-        "Ishan Kishan",
-        "Liam Livingstone",
-        "Mohsin Khan",
-        "Aiden Markram"
-    ],
-    "Delhi All Time": [
-        "Virender Sehwag",
-        "Shikhar Dhawan",
-        "Shreyas Iyer",
-        "Rishabh Pant",
-        "JP Duminy",
-        "Tristan Stubbs",
-        "Axar Patel",
-        "Chris Morris",
-        "Amit Mishra",
-        "Kagiso Rabada",
-        "Morne Morkel",
-        "David Warner",
-        "Marcus Stoinis",
-        "Kuldeep Yadav",
-        "Ashish Nehra"
-    ],
-    "New Zealand": [
-        "Finn Allen",
-        "Tim Seifert",
-        "Rachin Ravindra",
-        "Glenn Phillips",
-        "Daryl Mitchell",
-        "Mark Chapman",
-        "James Neesham",
-        "Mitchell Santner",
-        "Kyle Jamieson",
-        "Jacob Duffy",
-        "Matt Henry",
-        "Devon Conway",
-        "Cole McConchie",
-        "Ish Sodhi",
-        "Lockie Ferguson"
-    ],
-    "Om": [
-        "Jordan Cox",
-        "Phil Salt",
-        "Virat Kohli",
-        "Ruturaj Gaikwad",
-        "Sanju Samson",
-        "Shivam Dube",
-        "Josh Hazlewood",
-        "Noor Ahmad",
-        "Khaleel Ahmed",
-        "Bhuvneshwar Kumar",
-        "Krunal Pandya",
-        "Jacob Duffy",
-        "Rajat Patidar",
-        "Tim David",
-        "Matt Short"
-    ],
-    "RR All Time": [
-        "Jos Buttler",
-        "Yashasvi Jaiswal",
-        "Sanju Samson",
-        "Shane Watson",
-        "Yusuf Pathan",
-        "Shimron Hetmyer",
-        "James Faulkner",
-        "Jofra Archer",
-        "Shane Warne",
-        "Yuzvendra Chahal",
-        "Siddharth Trivedi",
-        "Ajinkya Rahane",
-        "Riyan Parag",
-        "Shreyas Gopal",
-        "Trent Boult"
-    ],
-    "The Hundred": [
-        "Phil Salt",
-        "Will Jacks",
-        "Jos Buttler",
-        "Jordan Cox",
-        "Harry Brook",
-        "Liam Livingstone",
-        "Sam Curran",
-        "Rashid Khan",
-        "Adil Rashid",
-        "Adam Milne",
-        "Tymal Mills",
-        "Ben Duckett",
-        "James Vince",
-        "Benny Howell",
-        "Chris Jordan"
-    ],
-    "KKR All Time": [
-        "Chris Lynn",
-        "Sunil Narine",
-        "Gautam Gambhir",
-        "Robin Uthappa",
-        "Rinku Singh",
-        "Yusuf Pathan",
-        "Andre Russell",
-        "Piyush Chawla",
-        "Harshit Rana",
-        "Umesh Yadav",
-        "Varun Chakravarthy",
-        "Nitish Rana",
-        "Jacques Kallis",
-        "Dinesh Karthik",
-        "Morne Morkel"
-    ],
-    "Hyderabad All Time": [
-        "David Warner",
-        "Shikhar Dhawan",
-        "Kane Williamson",
-        "Manish Pandey",
-        "Andrew Symonds",
-        "Heinrich Klaasen",
-        "Jason Holder",
-        "Rashid Khan",
-        "Bhuvneshwar Kumar",
-        "T. Natarajan",
-        "Dale Steyn",
-        "Jonny Bairstow",
-        "Rohit Sharma",
-        "Pragyan Ojha",
-        "RP Singh"
-    ],
-    "SA 20": [
-        "Ryan Rickelton",
-        "Will Jacks",
-        "Aiden Markram",
-        "Rassie van der Dussen",
-        "Heinrich Klaasen",
-        "Tristan Stubbs",
-        "Marco Jansen",
-        "George Linde",
-        "Bjorn Fortuin",
-        "Kagiso Rabada",
-        "Ottneil Baartman",
-        "Leus du Plooy",
-        "Dewald Brevis",
-        "Keshav Maharaj",
-        "Anrich Nortje"
-    ],
-    "Punjab All Time": [
-        "KL Rahul",
-        "Shaun Marsh",
-        "Shreyas Iyer",
-        "Glenn Maxwell",
-        "David Miller",
-        "Shashank Singh",
-        "Irfan Pathan",
-        "Axar Patel",
-        "Piyush Chawla",
-        "Arshdeep Singh",
-        "Sandeep Sharma",
-        "Mayank Agarwal",
-        "Liam Livingstone",
-        "Ravi Bishnoi",
-        "Mohammed Shami"
-    ],
-    "India": [
-        "Abhishek Sharma",
-        "Ishan Kishan",
-        "Tilak Varma",
-        "Suryakumar Yadav",
-        "Hardik Pandya",
-        "Shivam Dube",
-        "Rinku Singh",
-        "Axar Patel",
-        "Arshdeep Singh",
-        "Jasprit Bumrah",
-        "Varun Chakravarthy",
-        "Sanju Samson",
-        "Washington Sundar",
-        "Kuldeep Yadav",
-        "Mohammed Siraj"
-    ]
+  anuj:         ["Yashasvi Jaiswal",
+      "Ryan Rickelton",
+      "Suryakumar Yadav",
+      "Tilak Verma",
+      "Riyan Parag",
+      "Shimron Hetmyer",
+      "Ravindra Jadeja",
+      "Mitchell Santner",
+      "Tushar Deshpande",
+      "Trent Boult",
+      "Jasprit Bumrah"],
+  aqua:         ["Travis Head",
+      "Abhishek Sharma",
+      "Mitchell Marsh",
+      "Heinrich Klaasen",
+      "Nicholas Pooran",
+      "Rishabh Pant",
+      "Liam Livingstone",
+      "Wanindu Hasaranga",
+      "Harshal Patel",
+      "Mohammed Shami",
+      "Avesh Khan"],
+  bhukla:       ['Virat Kohli','Phil Salt','Ruturaj Gaikwad','Sanju Samson','Matt Short','Shivam Dube','Tim David','Krunal Pandya','Noor Ahmad','Josh Hazlewood','Jacob Duffy'],
+  patake:       ['Shubman Gill','Tim Seifert','Sai Sudharsan','Jos Buttler','Cameron Green','Rinku Singh','Sunil Narine','Jason Holder','Rashid Khan','Varun Chakravarthy','Matheesha Pathirana'],
+
+  // ─── Group A ───
+  southafrica:  ['Quinton de Kock','Reeza Hendricks','Aiden Markram','David Miller','Heinrich Klaasen','Marco Jansen','Keshav Maharaj','Kagiso Rabada','Anrich Nortje','Lungi Ngidi','Tabraiz Shamsi'],
+  rcbat:        ['Faf du Plessis','Virat Kohli','Glenn Maxwell','Liam Livingstone','Dinesh Karthik','Shahbaz Ahmed','Mahipal Lomror','Harshal Patel','Mohammed Siraj','Wayne Parnell','Josh Hazlewood'],
+  thehundred:   ['Will Jacks','Phil Salt','Dawid Malan','Tom Abell','Sam Billings','Jordan Cox','Jofra Archer','Chris Jordan','Mason Crane','Saqib Mahmood','Tom Hartley'],
+
+  // ─── Group B ───
+  australia:    ['David Warner','Travis Head','Steven Smith','Marnus Labuschagne','Tim David','Matthew Wade','Pat Cummins','Mitchell Starc','Adam Zampa','Josh Hazlewood','Mitchell Marsh'],
+  miat:         ['Rohit Sharma','Ishan Kishan','Suryakumar Yadav','Hardik Pandya','Tim David','Tilak Verma','Gerald Coetzee','Piyush Chawla','Jasprit Bumrah','Jason Behrendorff','Arjun Tendulkar'],
+  hydat:        ['Abhishek Sharma','Rahul Tripathi','Aiden Markram','Heinrich Klaasen','Shahbaz Ahmed','Abdul Samad','Washington Sundar','Bhuvneshwar Kumar','T Natarajan','Umran Malik','Mayank Markande'],
+
+  // ─── Group C ───
+  spdoxxers:    ['Babar Azam','Mohammad Rizwan','Fakhar Zaman','Shoaib Malik','Imad Wasim','Shadab Khan','Mohammad Nawaz','Haris Rauf','Shaheen Afridi','Naseem Shah','Usama Mir'],
+  newzealand:   ['Finn Allen','Devon Conway','Glenn Phillips','Daryl Mitchell','Mark Chapman','Tom Latham','Mitchell Santner','Ish Sodhi','Tim Southee','Trent Boult','Lockie Ferguson'],
+  kkrat:        ['Shreyas Iyer','Venkatesh Iyer','Nitish Rana','Rinku Singh','Andre Russell','Sunil Narine','Varun Chakravarthy','Umesh Yadav','Shivam Mavi','Harshit Rana','Kuldeep Yadav'],
+  sa20:         ['Reeza Hendricks','Tony de Zorzi','Dewald Brevis','Tristan Stubbs','Janneman Malan','Ryan Rickelton','Wiaan Mulder','Patrick Kruger','Ottneil Baartman','Nandre Burger','Lizaad Williams'],
+
+  // ─── Group D ───
+  asadlahori:   ['Imam-ul-Haq','Abdullah Shafique','Azam Khan','Salman Agha','Mohammad Nawaz','Hasan Ali','Haris Rauf','Shaheen Afridi','Naseem Shah','Agha Salman','Iftikhar Ahmed'],
+  england:      ['Jos Buttler','Jonny Bairstow','Dawid Malan','Ben Stokes','Liam Livingstone','Sam Curran','Adil Rashid','Mark Wood','Chris Woakes','Jofra Archer','Phil Salt'],
+  rrat:         ['Yashasvi Jaiswal','Jos Buttler','Sanju Samson','Devdutt Padikkal','Riyan Parag','Shimron Hetmyer','Ravichandran Ashwin','Trent Boult','Prasidh Krishna','Yuzvendra Chahal','Navdeep Saini'],
+  punat:        ['Shikhar Dhawan','Prabhsimran Singh','Bhanuka Rajapaksa','Liam Livingstone','Sikandar Raza','Sam Curran','Arshdeep Singh','Harpreet Brar','Rishi Dhawan','Nathan Ellis','Rahul Chahar'],
+
+  // ─── Group E ───
+  agendadoval:  ['KL Rahul','Deepak Hooda','Nicholas Pooran','Ayush Badoni','Marcus Stoinis','Krunal Pandya','Ravi Bishnoi','Avesh Khan','Dushmantha Chameera','Jason Holder','Mohsin Khan'],
+  india:        ['Rohit Sharma','Virat Kohli','Yashasvi Jaiswal','Suryakumar Yadav','Hardik Pandya','Ravindra Jadeja','Axar Patel','Kuldeep Yadav','Jasprit Bumrah','Mohammed Shami','Arshdeep Singh'],
+  cskat:        ['Ruturaj Gaikwad','Devon Conway','Shivam Dube','Ajinkya Rahane','Ambati Rayudu','MS Dhoni','Ravindra Jadeja','Mitchell Santner','Deepak Chahar','Tushar Deshpande','Matheesha Pathirana'],
+  delat:        ['David Warner','Mitchell Marsh','Axar Patel','Rishabh Pant','Rovman Powell','Tristan Stubbs','Lalit Yadav','Anrich Nortje','Khaleel Ahmed','Kuldeep Yadav','Mukesh Kumar'],
 };
 
 // ===================================================
@@ -1867,13 +1582,11 @@ function validateBowlingOrders() {
 
 function renderPointsTable() {
   const log = getMatchLog();
-  const empty = document.getElementById('pointsTableEmpty');
-  const wrap  = document.getElementById('pointsTableWrap');
+  const container = document.getElementById('groupPointsContainer');
+  if (!container) return;
 
-  // --- Build standings map ---
-  // Each team entry: { key, mp, w, l, d, pts, runsFor, ballsFor, runsAgainst, ballsAgainst }
+  // Build a standings map per team across all matches
   const table = {};
-
   const ensureTeam = (key) => {
     if (!table[key]) {
       table[key] = { key, mp:0, w:0, l:0, d:0, pts:0,
@@ -1882,145 +1595,153 @@ function renderPointsTable() {
   };
 
   log.forEach(m => {
-    const a = m.batFirst;    // batted first (inn1)
-    const b = m.fieldFirst;  // batted second (inn2)
+    const a = m.batFirst;
+    const b = m.fieldFirst;
     ensureTeam(a); ensureTeam(b);
-
-    // Runs / balls for NRR
     const inn1Balls = m.inn1.balls || 120;
     const inn2Balls = m.inn2.balls || 120;
 
-    // Team A (batted first)
     table[a].mp++;
-    table[a].runsFor     += m.inn1.runs;
-    table[a].ballsFor    += inn1Balls;
-    table[a].runsAgainst += m.inn2.runs;
-    table[a].ballsAgainst+= inn2Balls;
+    table[a].runsFor      += m.inn1.runs;
+    table[a].ballsFor     += inn1Balls;
+    table[a].runsAgainst  += m.inn2.runs;
+    table[a].ballsAgainst += inn2Balls;
 
-    // Team B (batted second)
     table[b].mp++;
-    table[b].runsFor     += m.inn2.runs;
-    table[b].ballsFor    += inn2Balls;
-    table[b].runsAgainst += m.inn1.runs;
-    table[b].ballsAgainst+= inn1Balls;
+    table[b].runsFor      += m.inn2.runs;
+    table[b].ballsFor     += inn2Balls;
+    table[b].runsAgainst  += m.inn1.runs;
+    table[b].ballsAgainst += inn1Balls;
 
     if (m.matchWinner === a) {
-      table[a].w++; table[a].pts += 2;
-      table[b].l++;
+      table[a].w++; table[a].pts += 2; table[b].l++;
     } else if (m.matchWinner === b) {
-      table[b].w++; table[b].pts += 2;
-      table[a].l++;
+      table[b].w++; table[b].pts += 2; table[a].l++;
     } else {
-      // Tie / no result
       table[a].d++; table[a].pts += 1;
       table[b].d++; table[b].pts += 1;
     }
   });
 
-  const rows = Object.values(table);
-
-  if (rows.length === 0) {
-    empty.style.display = 'flex';
-    wrap.style.display  = 'none';
-    document.getElementById('ptsSubtitle').textContent = 'Based on simulated matches';
-    return;
-  }
-
-  empty.style.display = 'none';
-  wrap.style.display  = 'block';
-  document.getElementById('ptsSubtitle').textContent =
-    `${log.length} match${log.length !== 1 ? 'es' : ''} • ${rows.length} team${rows.length !== 1 ? 's' : ''}`;
-
-  // Calculate NRR = (runsFor / oversFor) - (runsAgainst / oversAgainst)
-  rows.forEach(r => {
+  // Calculate NRR for each team
+  Object.values(table).forEach(r => {
     const orf = r.ballsFor    > 0 ? r.runsFor    / (r.ballsFor    / 6) : 0;
     const ora = r.ballsAgainst> 0 ? r.runsAgainst/ (r.ballsAgainst/ 6) : 0;
     r.nrr = orf - ora;
   });
 
-  // Sort: pts desc → nrr desc → name asc
-  rows.sort((a, b) => b.pts - a.pts || b.nrr - a.nrr ||
-    (TEAM_DISPLAY[a.key] || a.key).localeCompare(TEAM_DISPLAY[b.key] || b.key));
-
   const rankClass = ['gold','silver','bronze'];
   const rowClass  = ['pts-leader','pts-second','pts-third'];
 
-  document.getElementById('pointsTableBody').innerHTML = rows.map((r, i) => {
-    const teamName  = TEAM_DISPLAY[r.key] || r.key;
-    const teamColor = TEAM_COLORS[r.key]  || 'var(--text)';
-    const nrrStr    = r.nrr >= 0
-      ? '+' + r.nrr.toFixed(3)
-      : r.nrr.toFixed(3);
-    const nrrClass  = r.nrr > 0 ? 'pts-nrr-pos' : r.nrr < 0 ? 'pts-nrr-neg' : 'pts-nrr-zero';
+  function buildGroupTable(groupName, teamKeys) {
+    const rows = teamKeys.map(key => table[key] || {
+      key, mp:0, w:0, l:0, d:0, pts:0, nrr:0
+    });
 
-    return `<tr class="pts-row ${rowClass[i] || ''}">
-      <td class="pts-td pts-td-rank ${rankClass[i] || ''}">#${i+1}</td>
-      <td class="pts-td pts-td-team" style="color:${teamColor}">${teamName}</td>
-      <td class="pts-td pts-td-num">${r.mp}</td>
-      <td class="pts-td pts-td-num">${r.w}</td>
-      <td class="pts-td pts-td-num">${r.l}</td>
-      <td class="pts-td pts-td-num">${r.d}</td>
-      <td class="pts-td pts-td-pts">${r.pts}</td>
-      <td class="pts-td pts-td-nrr ${nrrClass}">${nrrStr}</td>
-    </tr>`;
-  }).join('');
-}
+    // Sort: pts desc → nrr desc
+    rows.sort((a, b) => b.pts - a.pts || (b.nrr||0) - (a.nrr||0) ||
+      (TEAM_DISPLAY[a.key]||a.key).localeCompare(TEAM_DISPLAY[b.key]||b.key));
 
+    const groupColor = (() => {
+      const firstKey = teamKeys[0];
+      return TEAM_COLORS[firstKey] || 'var(--accent)';
+    })();
 
-// ===================================================
-//   FIREBASE DATABASE SETUP
-// ===================================================
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCjnLPBSCF9QN62qiB4zgppuqTHhCiSbog",
-  authDomain: "sacks-sim.firebaseapp.com",
-  databaseURL: "https://sacks-sim-default-rtdb.firebaseio.com",
-  projectId: "sacks-sim",
-  storageBucket: "sacks-sim.firebasestorage.app",
-  messagingSenderId: "177965098130",
-  appId: "1:177965098130:web:18aa2118896ffb9b77b24b",
-  measurementId: "G-MWJRX7DZC4"
-};
-
-// Initialize Firebase (Compat Version)
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-// Declare memoryLog EXACTLY once to prevent fatal crashes
-let memoryLog = []; 
-
-// 1. Real-time Listener: Magically updates the app when anyone plays a match
-db.ref('matches').on('value', (snapshot) => {
-  const data = snapshot.val();
-  memoryLog = data ? Object.values(data) : [];
-  
-  const dash = document.getElementById('slideDashboard');
-  if (dash && dash.classList.contains('open')) {
-    renderDashboard();
+    return `
+      <div class="group-table-section" style="margin-bottom: 28px;">
+        <div class="group-table-header" style="border-left: 3px solid ${groupColor}; padding-left: 10px; margin-bottom: 10px;">
+          <span style="font-family:'Bebas Neue'; font-size:1.3rem; letter-spacing:2px; color:${groupColor}">${groupName}</span>
+        </div>
+        <table class="pts-table">
+          <thead>
+            <tr>
+              <th class="pts-th pts-th-rank">#</th>
+              <th class="pts-th pts-th-team">Team</th>
+              <th class="pts-th pts-th-num">M</th>
+              <th class="pts-th pts-th-num">W</th>
+              <th class="pts-th pts-th-num">L</th>
+              <th class="pts-th pts-th-num">D</th>
+              <th class="pts-th pts-th-num pts-pts-col">PTS</th>
+              <th class="pts-th pts-th-nrr">NRR</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map((r, i) => {
+              const teamName  = TEAM_DISPLAY[r.key] || r.key;
+              const teamColor = TEAM_COLORS[r.key]  || 'var(--text)';
+              const nrr = r.nrr || 0;
+              const nrrStr = nrr >= 0 ? '+' + nrr.toFixed(3) : nrr.toFixed(3);
+              const nrrClass = nrr > 0 ? 'pts-nrr-pos' : nrr < 0 ? 'pts-nrr-neg' : 'pts-nrr-zero';
+              return `<tr class="pts-row ${rowClass[i] || ''}">
+                <td class="pts-td pts-td-rank ${rankClass[i] || ''}">#${i+1}</td>
+                <td class="pts-td pts-td-team" style="color:${teamColor}">${teamName}</td>
+                <td class="pts-td pts-td-num">${r.mp||0}</td>
+                <td class="pts-td pts-td-num">${r.w||0}</td>
+                <td class="pts-td pts-td-num">${r.l||0}</td>
+                <td class="pts-td pts-td-num">${r.d||0}</td>
+                <td class="pts-td pts-td-pts">${r.pts||0}</td>
+                <td class="pts-td pts-td-nrr ${nrrClass}">${nrrStr}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
   }
-});
+
+  container.innerHTML = Object.entries(TOURNAMENT_GROUPS)
+    .map(([groupName, teamKeys]) => buildGroupTable(groupName, teamKeys))
+    .join('');
+
+  // Update subtitle
+  const totalMatches = log.length;
+  const ptsSubtitle = document.getElementById('ptsSubtitle');
+  if (ptsSubtitle) {
+    ptsSubtitle.textContent = `${totalMatches} match${totalMatches !== 1 ? 'es' : ''} • 5 Groups`;
+  }
+}
+// ===================================================
+
+let memoryLog = []; // Bulletproof fallback for browser restrictions
 
 function getMatchLog() {
-  return memoryLog;
+  try {
+    const log = localStorage.getItem('iplSimLog');
+    return log ? JSON.parse(log) : memoryLog;
+  } catch(e) {
+    return memoryLog; // Use fallback if browser blocks storage
+  }
 }
 
 function saveMatchToLog(data) {
+  const log = getMatchLog();
   if (!data.id) {
     data.id = Date.now();
     data.date = new Date().toISOString();
   }
-  db.ref('matches/' + data.id).set(data);
+  log.push(data);
+  memoryLog = log; // Update fallback
+  try {
+    localStorage.setItem('iplSimLog', JSON.stringify(log));
+  } catch(e) {
+    console.warn("Browser blocked save. Match saved to memory instead.");
+  }
 }
 
 function clearMatchLog() {
-  db.ref('matches').remove();
-  renderDashboard();
+  // Bypassing browser 'confirm' popups to ensure it always fires
+  try { localStorage.removeItem('iplSimLog'); } catch(e) {}
+  memoryLog = [];
+  renderDashboard(); // Instantly clears the screen
 }
 
 function deleteMatch(id, event) {
-  if (event) event.stopPropagation(); 
-  db.ref('matches/' + id).remove();
-  renderDashboard(); 
+  event.stopPropagation(); // Prevents opening the match when clicking X
+  let log = getMatchLog();
+  log = log.filter(m => m.id !== id);
+  memoryLog = log;
+  try { localStorage.setItem('iplSimLog', JSON.stringify(log)); } catch(e) {}
+  renderDashboard(); // Instantly refreshes the screen
 }
 
 function loadHistoricalMatch(id) {
@@ -2109,12 +1830,18 @@ function renderDashboard() {
     
     squad.forEach(name => {
       const p = PLAYER_DB[name] || { role: 'unknown' };
-      const statsBat = batTotals[name] || { runs: 0, balls: 0, matches: 0 };
-      const statsBowl = bowlTotals[name] || { wickets: 0, runs: 0, overs: 0, matches: 0 };
+      const statsBat  = batTotals[teamKey + ':' + name]  || { runs: 0, balls: 0, matches: 0 };
+      const statsBowl = bowlTotals[teamKey + ':' + name] || { wickets: 0, runs: 0, overs: 0, matches: 0 };
       
       // Calculate advanced stats
       const sr = statsBat.balls > 0 ? ((statsBat.runs / statsBat.balls) * 100).toFixed(1) : '0.0';
       const eco = statsBowl.overs > 0 ? (statsBowl.runs / statsBowl.overs).toFixed(2) : '0.00';
+      const innings = statsBat.innings || 0;
+      const dismissals = innings - (statsBat.notOuts || 0);
+      // Cricket avg: runs / dismissals; if never dismissed show runs* (not-out)
+      const avg = dismissals > 0
+        ? (statsBat.runs / dismissals).toFixed(1)
+        : innings > 0 ? statsBat.runs + '*' : '—';
       
       // Badges
       const fireIcon = HOT_PLAYERS[name] ? `<span class="fire-badge">🔥 HOT</span>` : '';
@@ -2127,8 +1854,10 @@ function renderDashboard() {
             <div class="roster-name">${name} ${ocIcon}${pcIcon}${fireIcon}</div>
             <div class="roster-role">${p.role}</div>
           </div>
-          <div class="roster-stats-grid">
+          <div class="roster-stats-grid roster-stats-grid--6">
+            <div class="r-stat"><div class="r-val" style="color:var(--text)">${innings}</div><div class="r-lbl">INNS</div></div>
             <div class="r-stat"><div class="r-val" style="color:var(--text)">${statsBat.runs}</div><div class="r-lbl">RUNS</div></div>
+            <div class="r-stat"><div class="r-val" style="color:var(--accent3)">${avg}</div><div class="r-lbl">AVG</div></div>
             <div class="r-stat"><div class="r-val" style="color:var(--text)">${sr}</div><div class="r-lbl">SR</div></div>
             <div class="r-stat"><div class="r-val" style="color:var(--accent2)">${statsBowl.wickets}</div><div class="r-lbl">WKTS</div></div>
             <div class="r-stat"><div class="r-val" style="color:var(--accent2)">${eco}</div><div class="r-lbl">ECO</div></div>
@@ -2170,42 +1899,74 @@ function renderDashboard() {
   content.style.display = 'block';
 
   // ── Aggregate player stats across all matches ──
-  const batTotals  = {};  // name → { runs, balls, fours, sixes, matches }
-  const bowlTotals = {};  // name → { wickets, runs, overs, matches }
+  // Keys are "teamKey:playerName" for team-specific stats
+  const batTotals  = {};  // "teamKey:name" → { runs, balls, fours, sixes, matches }
+  const bowlTotals = {};  // "teamKey:name" → { wickets, runs, overs, matches }
 
   log.forEach(match => {
-    const processInnings = (inn, isBatting) => {
+    // Determine which team key each innings belongs to
+    const inn1TeamKey = match.batFirst;
+    const inn2TeamKey = match.fieldFirst;
+
+    const processInnings = (inn, isBatting, teamKey) => {
       if (isBatting) {
         inn.battingCard.forEach(b => {
-          if (!batTotals[b.name]) batTotals[b.name] = { runs:0, balls:0, fours:0, sixes:0, matches:0 };
-          batTotals[b.name].runs   += b.runs;
-          batTotals[b.name].balls  += b.balls;
-          batTotals[b.name].fours  += b.fours;
-          batTotals[b.name].sixes  += b.sixes;
-          batTotals[b.name].matches++;
+          const k = teamKey + ':' + b.name;
+          if (!batTotals[k]) batTotals[k] = { runs:0, balls:0, fours:0, sixes:0, matches:0, innings:0, notOuts:0 };
+          batTotals[k].runs    += b.runs;
+          batTotals[k].balls   += b.balls;
+          batTotals[k].fours   += b.fours;
+          batTotals[k].sixes   += b.sixes;
+          batTotals[k].matches++;
+          batTotals[k].innings++;
+          if (!b.isOut) batTotals[k].notOuts++;
         });
       } else {
         inn.bowlingCard.forEach(b => {
-          if (!bowlTotals[b.name]) bowlTotals[b.name] = { wickets:0, runs:0, overs:0, matches:0 };
-          bowlTotals[b.name].wickets += b.wickets;
-          bowlTotals[b.name].runs    += b.runs;
-          bowlTotals[b.name].overs   += parseFloat(b.overs) || 0;
-          bowlTotals[b.name].matches++;
+          const k = teamKey + ':' + b.name;
+          if (!bowlTotals[k]) bowlTotals[k] = { wickets:0, runs:0, overs:0, matches:0 };
+          bowlTotals[k].wickets += b.wickets;
+          bowlTotals[k].runs    += b.runs;
+          bowlTotals[k].overs   += parseFloat(b.overs) || 0;
+          bowlTotals[k].matches++;
         });
       }
     };
-    processInnings(match.inn1, true);
-    processInnings(match.inn2, false);
-    processInnings(match.inn2, true);
-    processInnings(match.inn1, false);
+    processInnings(match.inn1, true,  inn1TeamKey);
+    processInnings(match.inn2, false, inn1TeamKey);
+    processInnings(match.inn2, true,  inn2TeamKey);
+    processInnings(match.inn1, false, inn2TeamKey);
   });
 
-  // Sort leaderboards
-  const topBats = Object.entries(batTotals).sort((a,b) => b[1].runs - a[1].runs).slice(0, 5);
-  const topBowlers = Object.entries(bowlTotals).sort((a,b) => b[1].wickets - a[1].wickets || (a[1].runs / Math.max(a[1].overs,1)) - (b[1].runs / Math.max(b[1].overs,1))).slice(0, 5);
+  // Flat totals (across all teams) used for leaderboard caps
+  const batTotalsFlat  = {};
+  const bowlTotalsFlat = {};
+  Object.entries(batTotals).forEach(([k, v]) => {
+    const name = k.split(':').slice(1).join(':');
+    if (!batTotalsFlat[name]) batTotalsFlat[name] = { runs:0, balls:0, fours:0, sixes:0, matches:0, innings:0, notOuts:0 };
+    batTotalsFlat[name].runs    += v.runs;
+    batTotalsFlat[name].balls   += v.balls;
+    batTotalsFlat[name].fours   += v.fours;
+    batTotalsFlat[name].sixes   += v.sixes;
+    batTotalsFlat[name].matches += v.matches;
+    batTotalsFlat[name].innings += v.innings;
+    batTotalsFlat[name].notOuts += v.notOuts;
+  });
+  Object.entries(bowlTotals).forEach(([k, v]) => {
+    const name = k.split(':').slice(1).join(':');
+    if (!bowlTotalsFlat[name]) bowlTotalsFlat[name] = { wickets:0, runs:0, overs:0, matches:0 };
+    bowlTotalsFlat[name].wickets += v.wickets;
+    bowlTotalsFlat[name].runs    += v.runs;
+    bowlTotalsFlat[name].overs   += v.overs;
+    bowlTotalsFlat[name].matches += v.matches;
+  });
+
+  // Sort leaderboards (use flat totals — across all teams)
+  const topBats = Object.entries(batTotalsFlat).sort((a,b) => b[1].runs - a[1].runs).slice(0, 5);
+  const topBowlers = Object.entries(bowlTotalsFlat).sort((a,b) => b[1].wickets - a[1].wickets || (a[1].runs / Math.max(a[1].overs,1)) - (b[1].runs / Math.max(b[1].overs,1))).slice(0, 5);
   
   // Super Striker (Min 15 balls faced)
-  const topStrikers = Object.entries(batTotals)
+  const topStrikers = Object.entries(batTotalsFlat)
     .filter(([name, s]) => s.balls >= 15)
     .map(([name, s]) => ({ name, sr: (s.runs / s.balls) * 100, runs: s.runs, balls: s.balls }))
     .sort((a, b) => b.sr - a.sr)
@@ -2337,91 +2098,6 @@ function buildPlayer(d) {
 }
 
 // ===================================================
-//   MASTER TEAM MANAGEMENT
-// ===================================================
-
-function openMasterTeamModal() {
-  const select = document.getElementById('masterTeamSelect');
-  // Populate the team dropdown dynamically
-  select.innerHTML = '<option value="">— Select a Team —</option>';
-  Object.entries(TEAM_DISPLAY).forEach(([key, name]) => {
-    select.innerHTML += `<option value="${key}">${name}</option>`;
-  });
-  
-  document.getElementById('masterTeamEditorList').innerHTML = '';
-  document.getElementById('masterTeamModalOverlay').classList.add('show');
-  document.getElementById('masterTeamModal').style.display = 'block';
-}
-
-function closeMasterTeamModal() {
-  document.getElementById('masterTeamModalOverlay').classList.remove('show');
-  document.getElementById('masterTeamModal').style.display = 'none';
-}
-
-function renderMasterTeamEditor() {
-  const teamKey = document.getElementById('masterTeamSelect').value;
-  const list = document.getElementById('masterTeamEditorList');
-  
-  if (!teamKey) {
-    list.innerHTML = '';
-    return;
-  }
-
-  const roster = TEAM_ROSTERS[teamKey] || [];
-  const allPlayers = Object.keys(PLAYER_DB).sort();
-
-  list.innerHTML = '';
-  // Ensure we have 11 slots to fill
-  const slots = Array.from({ length: 11 }, (_, i) => roster[i] || '');
-
-  slots.forEach((player, i) => {
-    const row = document.createElement('div');
-    row.className = 'xi-slot';
-    row.innerHTML = `
-      <span class="xi-num">${i + 1}</span>
-      <select class="xi-select" id="masterXiSlot_${i}">
-        <option value="">— Select Player —</option>
-        ${allPlayers.map(p => `<option value="${p}" ${p === player ? 'selected' : ''}>${p}</option>`).join('')}
-      </select>
-    `;
-    list.appendChild(row);
-  });
-}
-
-function saveMasterTeamXi() {
-  const teamKey = document.getElementById('masterTeamSelect').value;
-  if (!teamKey) {
-    alert("Please select a team first.");
-    return;
-  }
-
-  const newXi = [];
-  for (let i = 0; i < 11; i++) {
-    const sel = document.getElementById(`masterXiSlot_${i}`);
-    if (sel && sel.value) newXi.push(sel.value);
-    else newXi.push('');
-  }
-
-  const filled = newXi.filter(Boolean);
-  if (filled.length < 11) {
-    const missing = 11 - filled.length;
-    if (!confirm(`This team has ${missing} empty slot(s). Save anyway?`)) return;
-  }
-
-  // Update the global roster memory
-  TEAM_ROSTERS[teamKey] = newXi.filter(Boolean);
-
-  // Show the green checkmark message
-  const msg = document.getElementById('masterXiSaveMsg');
-  if (msg) {
-    msg.style.display = 'inline-block';
-    setTimeout(() => { msg.style.display = 'none'; }, 2500);
-  }
-  
-  console.log(`[AUTH] Master updated ${teamKey} Playing XI:`, TEAM_ROSTERS[teamKey]);
-}
-
-// ===================================================
 //   INIT
 // ===================================================
 
@@ -2430,7 +2106,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   await loadPlayerData();
   document.getElementById('team1Select').addEventListener('change', () => { customBowlingOrders.t1 = []; });
   document.getElementById('team2Select').addEventListener('change', () => { customBowlingOrders.t2 = []; });
-  
   // Show/hide speed selector when live toggle is flipped
   document.getElementById('liveToggle').addEventListener('click', () => {
     setTimeout(() => {
@@ -2439,6 +2114,3 @@ window.addEventListener('DOMContentLoaded', async () => {
     }, 0);
   });
 });
-
-
-
