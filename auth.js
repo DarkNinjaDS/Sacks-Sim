@@ -8,11 +8,42 @@
 // ===================================================
 
 const USERS = {
-  aqua:   { password: 'aqua18',   access: 'master', team: 'aqua',   displayName: 'Aqua' },
+  // Masters
+  aqua:   { password: 'aqua18',    access: 'master', team: 'aqua',   displayName: 'Aqua' },
   anuj:   { password: 'lenda45',   access: 'master', team: 'anuj',   displayName: 'Anuj' },
-  pranav: { password: 'pranav123', access: 'master', team: 'pranav', displayName: 'Pranav' },
+  pranav: { password: 'pranav123', access: 'master', team: null,     displayName: 'Pranav' },
+  
+  // Original Players
   bhukla: { password: 'bhukla123', access: 'player', team: 'bhukla', displayName: 'Bhukla' },
   patake: { password: 'patake123', access: 'player', team: 'patake', displayName: 'Patake' },
+  
+  // Player for Pranav's team (Since Pranav master is set to null)
+  agenda: { password: 'agenda123', access: 'player', team: 'pranav', displayName: 'Agenda Doval' },
+
+  // Group A
+  sa:         { password: 'sa123',         access: 'player', team: 'southafrica', displayName: 'South Africa' },
+  rcbat:      { password: 'rcbat123',      access: 'player', team: 'rcbat',       displayName: 'RCB AT' },
+  thehundred: { password: 'thehundred123', access: 'player', team: 'thehundred',  displayName: 'The Hundred' },
+
+  // Group B
+  aus:        { password: 'aus123',        access: 'player', team: 'australia',   displayName: 'Australia' },
+  miat:       { password: 'miat123',       access: 'player', team: 'miat',        displayName: 'MI AT' },
+  hydat:      { password: 'hydat123',      access: 'player', team: 'hydat',       displayName: 'HYD AT' },
+
+  // Group C
+  nz:         { password: 'nz123',         access: 'player', team: 'newzealand',  displayName: 'New Zealand' },
+  kkrat:      { password: 'kkrat123',      access: 'player', team: 'kkrat',       displayName: 'KKR AT' },
+  sa20:       { password: 'sa20123',       access: 'player', team: 'sa20',        displayName: 'SA20' },
+
+  // Group D
+  eng:        { password: 'eng123',        access: 'player', team: 'england',     displayName: 'England' },
+  rrat:       { password: 'rrat123',       access: 'player', team: 'rrat',        displayName: 'RR AT' },
+  punat:      { password: 'punat123',      access: 'player', team: 'punat',       displayName: 'PUN AT' },
+
+  // Group E
+  ind:        { password: 'ind123',        access: 'player', team: 'india',       displayName: 'India' },
+  cskat:      { password: 'cskat123',      access: 'player', team: 'cskat',       displayName: 'CSK AT' },
+  delat:      { password: 'delat123',      access: 'player', team: 'delat',       displayName: 'DEL AT' }
 };
 
 // Currently logged-in user state
