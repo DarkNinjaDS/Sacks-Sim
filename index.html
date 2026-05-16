@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SACKS SIM — Our S tier Simulator</title>
+  <title>IPL SIM — Cricket Match Simulator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -239,46 +239,125 @@
       display: none;
     }
 
+    /* ── Playing XI drag-and-drop ── */
     .playing-xi-list {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
+      min-height: 40px;
     }
 
     .xi-slot {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 10px 7px 6px;
+      transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+      cursor: default;
+      user-select: none;
+    }
+
+    .xi-slot.xi-draggable { cursor: grab; }
+    .xi-slot.xi-draggable:active { cursor: grabbing; }
+
+    .xi-slot.xi-dragging {
+      opacity: 0.35;
+    }
+
+    .xi-slot.xi-drag-over {
+      border-color: var(--accent);
+      background: rgba(0, 212, 255, 0.07);
+    }
+
+    .xi-drag-handle {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1;
+      flex-shrink: 0;
+      cursor: grab;
+      padding: 0 2px;
     }
 
     .xi-num {
       font-family: 'Space Mono', monospace;
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       color: var(--muted);
-      width: 18px;
+      width: 16px;
       flex-shrink: 0;
       text-align: right;
     }
 
-    .xi-select {
+    .xi-name {
       flex: 1;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 7px 10px;
-      border-radius: 6px;
       font-family: 'DM Sans', sans-serif;
-      font-size: 0.8rem;
-      margin-bottom: 0;
-      outline: none;
-      transition: border-color 0.2s;
-      -webkit-appearance: none;
-      appearance: none;
+      font-size: 0.82rem;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    .xi-select:focus {
+
+    .xi-remove-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 0.75rem;
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      line-height: 1;
+      flex-shrink: 0;
+      transition: color 0.15s;
+      width: auto;
+    }
+    .xi-remove-btn:hover { color: var(--accent2); }
+
+    /* Bench */
+    .xi-bench-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      color: var(--muted);
+      letter-spacing: 2px;
+      margin: 10px 0 6px;
+    }
+
+    .xi-bench-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      min-height: 28px;
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px dashed rgba(255,255,255,0.1);
+    }
+
+    .xi-bench-list.xi-drag-over-bench {
+      border-color: var(--accent);
+      background: rgba(0,212,255,0.04);
+    }
+
+    .xi-bench-pill {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.75rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+      user-select: none;
+    }
+    .xi-bench-pill:hover {
+      background: rgba(0,212,255,0.1);
+      color: var(--accent);
       border-color: var(--accent);
     }
-    .xi-select option { background: #111926; }
+    .xi-bench-pill.xi-dragging { opacity: 0.35; }
 
     /* ════════════════════════════════════════
        MASTER-ONLY / PLAYER-ONLY UI STATES
@@ -360,10 +439,6 @@
 
       <!-- Player Team Management Section (player-level only) -->
       <div id="playerTeamSection"></div>
-      <div class="sidebar-section" data-master-only>
-        <div class="sidebar-title">Master Controls</div>
-        <button class="btn btn-secondary" onclick="openMasterTeamModal()">⚙️ Manage All Playing XIs</button>
-      </div>
 
       <div class="sidebar-section">
         <div class="sidebar-title">Match Setup</div>
@@ -816,27 +891,6 @@
   </div>
 </div>
 
-<div id="masterTeamModalOverlay" class="dash-overlay" onclick="closeMasterTeamModal()"></div>
-<div id="masterTeamModal" class="modal">
-  <div class="modal-header">
-    <h2 style="font-family:'Bebas Neue'; letter-spacing:2px; margin:0; color:var(--accent);">Manage Playing XIs</h2>
-    <button class="close-btn" onclick="closeMasterTeamModal()">✕</button>
-  </div>
-  <div class="modal-body">
-    <div style="margin-bottom:15px;">
-      <label style="font-family:'Space Mono', monospace; font-size:0.7rem; color:var(--muted); text-transform:uppercase;">Select Team to Edit</label>
-      <select id="masterTeamSelect" class="xi-select" style="width:100%; margin-top:5px;" onchange="renderMasterTeamEditor()">
-        <option value="">— Select a Team —</option>
-      </select>
-    </div>
-    <div id="masterTeamEditorList" class="playing-xi-list"></div>
-  </div>
-  <div class="modal-footer">
-    <button class="btn btn-primary" style="width:auto;" onclick="saveMasterTeamXi()">Save XI</button>
-    <span id="masterXiSaveMsg" style="display:none; margin-left:15px; font-family:'Space Mono', monospace; font-size:0.8rem; color:var(--accent3);">✓ Saved!</span>
-  </div>
-</div>
-
 <!-- LOADING OVERLAY -->
 <div id="loading">
   <div class="spinner"></div>
@@ -844,13 +898,8 @@
 </div>
 
 </div><!-- /appWrapper -->
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
 <script src="app.js"></script>
 <script src="auth.js"></script>
 </body>
 </html>
-
-
-
