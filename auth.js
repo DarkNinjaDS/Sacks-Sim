@@ -205,8 +205,10 @@ function showPlayerTeamSection() {
   const teamKey = currentUser.team;
   const teamName = TEAM_DISPLAY[teamKey] || teamKey;
   const roster = TEAM_ROSTERS[teamKey] || [];
-  // Only show players from this team's roster (team-specific XI)
-  const allPlayers = (TEAM_ROSTERS[teamKey] || Object.keys(PLAYER_DB)).slice().sort();
+  
+  // FIX: Force the pool to STRICTLY be the 15 players assigned to this team
+  // No falling back to Object.keys(PLAYER_DB) anymore
+  const allPlayers = roster.slice().sort();
 
   container.style.display = 'block';
   container.innerHTML = `
