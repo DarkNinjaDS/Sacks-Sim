@@ -793,8 +793,8 @@ async function runSimulation() {
   }
 
   // Map which custom config goes to which innings
-  const inn1BowlingOrder = (fieldFirst === t1key) ? customBowlingOrders.t1 : customBowlingOrders.t2;
-  const inn2BowlingOrder = (batFirst === t1key)   ? customBowlingOrders.t1 : customBowlingOrders.t2;
+  const inn1BowlingOrder = customBowlingOrders[fieldFirst] || [];
+  const inn2BowlingOrder = customBowlingOrders[batFirst] || [];
 
   // ── Normal instant simulation ──
   // Calculate Hot Streaks right before pulling players
@@ -1248,8 +1248,8 @@ async function runLiveSimulation(t1key, t2key, venue, pitchType, dew, tossWinner
   // Pre-compute the full innings data first (identical engine)
   const battingTeam1 = getTeamPlayers(batFirst);
   const bowlingTeam1 = getTeamPlayers(fieldFirst);
-  const inn1BowlingOrder = (fieldFirst === t1key) ? customBowlingOrders.t1 : customBowlingOrders.t2;
-  const inn2BowlingOrder = (batFirst === t1key)   ? customBowlingOrders.t1 : customBowlingOrders.t2;
+  const inn1BowlingOrder = customBowlingOrders[fieldFirst] || [];
+  const inn2BowlingOrder = customBowlingOrders[batFirst] || [];
   const inn1Full = simulateInnings(battingTeam1, bowlingTeam1, null,             { pace, spin, outfield, dew: false, customBowlingOrder: inn1BowlingOrder });
   const target   = inn1Full.runs + 1;
   const inn2Full = simulateInnings(bowlingTeam1, battingTeam1, target,           { pace, spin, outfield, dew, customBowlingOrder: inn2BowlingOrder });
@@ -1534,7 +1534,7 @@ function stopLive() {
 //   CUSTOM BOWLING ORDERS
 // ===================================================
 
-let customBowlingOrders = { t1: [], t2: [] };
+let customBowlingOrders = {};
 
 // Try to load saved bowling orders from localStorage
 try {
@@ -1556,13 +1556,17 @@ function openBowlingModal() {
   const t1Roster = getTeamPlayers(t1key);
   const t2Roster = getTeamPlayers(t2key);
 
-  document.getElementById('t1BowlSetup').innerHTML = buildBowlingCol(t1Name, 't1', t1Roster);
-  document.getElementById('t2BowlSetup').innerHTML = buildBowlingCol(t2Name, 't2', t2Roster);
+  // Access Control: Check if user is master or owns the specific team
+  const isMaster = currentUser && currentUser.access === 'master';
+  const canEditT1 = isMaster || (currentUser && currentUser.team === t1key);
+  const canEditT2 = isMaster || (currentUser && currentUser.team === t2key);
+
+  document.getElementById('t1BowlSetup').innerHTML = buildBowlingCol(t1Name, t1key, t1Roster, canEditT1);
+  document.getElementById('t2BowlSetup').innerHTML = buildBowlingCol(t2Name, t2key, t2Roster, canEditT2);
 
   document.getElementById('bowlingModalOverlay').classList.add('show');
   document.getElementById('bowlingModal').style.display = 'block';
   
-  // Run validation once to catch any previously saved errors
   validateBowlingOrders();
 }
 
@@ -1571,29 +1575,50 @@ function closeBowlingModal() {
   document.getElementById('bowlingModal').style.display = 'none';
 }
 
-function buildBowlingCol(teamName, teamId, roster) {
+function buildBowlingCol(teamName, teamKey, roster, canEdit) {
   let html = `<h3 style="font-family:'Bebas Neue'; color:var(--accent); margin-bottom:16px; letter-spacing:1px; font-size:1.4rem;">${teamName} Bowling</h3>`;
+  const currentOrder = customBowlingOrders[teamKey] || [];
+  
   for (let i = 1; i <= 20; i++) {
-    const prevVal = customBowlingOrders[teamId][i - 1] || 'auto';
+    const prevVal = currentOrder[i - 1] || 'auto';
     const options = `<option value="auto">🤖 Auto (Smart Select)</option>` +
                     roster.map(p => `<option value="${p}" ${prevVal === p ? 'selected' : ''}>${p}</option>`).join('');
     
-    // Notice the onchange event here:
-    html += `<div style="display:flex; align-items:center; margin-bottom:10px;">
+    // Disable the select element if the user doesn't have permission
+    const disabledAttr = canEdit ? '' : 'disabled';
+    const opacityStyle = canEdit ? '' : 'opacity:0.6; pointer-events:none;';
+
+    html += `<div style="display:flex; align-items:center; margin-bottom:10px; ${opacityStyle}">
       <div style="width:55px; font-family:'Space Mono', monospace; font-size:0.75rem; color:var(--muted);">Ov ${i}</div>
-      <select id="bowl_${teamId}_${i}" style="margin-bottom:0; padding:8px 12px; flex:1;" onchange="validateBowlingOrders()">${options}</select>
+      <select id="bowl_${teamKey}_${i}" style="margin-bottom:0; padding:8px 12px; flex:1;" onchange="validateBowlingOrders()" ${disabledAttr}>${options}</select>
     </div>`;
   }
   return html;
 }
 
 function saveBowlingModal() {
-  for (let i = 1; i <= 20; i++) {
-    customBowlingOrders.t1[i - 1] = document.getElementById(`bowl_t1_${i}`).value;
-    customBowlingOrders.t2[i - 1] = document.getElementById(`bowl_t2_${i}`).value;
+  const t1key = document.getElementById('team1Select').value;
+  const t2key = document.getElementById('team2Select').value;
+  
+  const isMaster = currentUser && currentUser.access === 'master';
+  const canEditT1 = isMaster || (currentUser && currentUser.team === t1key);
+  const canEditT2 = isMaster || (currentUser && currentUser.team === t2key);
+
+  // Only save the columns the user actually has permission to edit
+  if (canEditT1) {
+    customBowlingOrders[t1key] = [];
+    for (let i = 1; i <= 20; i++) {
+      customBowlingOrders[t1key].push(document.getElementById(`bowl_${t1key}_${i}`).value);
+    }
   }
   
-  // Save the new orders to localStorage
+  if (canEditT2) {
+    customBowlingOrders[t2key] = [];
+    for (let i = 1; i <= 20; i++) {
+      customBowlingOrders[t2key].push(document.getElementById(`bowl_${t2key}_${i}`).value);
+    }
+  }
+  
   try {
     localStorage.setItem('sackssim_bowling_orders', JSON.stringify(customBowlingOrders));
   } catch (e) {
@@ -1604,15 +1629,17 @@ function saveBowlingModal() {
 }
 
 function validateBowlingOrders() {
+  const t1key = document.getElementById('team1Select').value;
+  const t2key = document.getElementById('team2Select').value;
   let hasErrors = false;
   
-  ['t1', 't2'].forEach(teamId => {
+  [t1key, t2key].forEach(teamKey => {
+    if (!teamKey) return;
     const counts = {};
     let prev = null;
     
-    // Pass 1: Clear old errors, check for back-to-back overs, and count totals
     for (let i = 1; i <= 20; i++) {
-      const sel = document.getElementById(`bowl_${teamId}_${i}`);
+      const sel = document.getElementById(`bowl_${teamKey}_${i}`);
       if (!sel) continue;
       
       sel.classList.remove('select-error');
@@ -1620,10 +1647,9 @@ function validateBowlingOrders() {
       
       if (val !== 'auto') {
         counts[val] = (counts[val] || 0) + 1;
-        // Check back-to-back constraint
         if (val === prev) {
           sel.classList.add('select-error');
-          const prevSel = document.getElementById(`bowl_${teamId}_${i-1}`);
+          const prevSel = document.getElementById(`bowl_${teamKey}_${i-1}`);
           if (prevSel) prevSel.classList.add('select-error');
           hasErrors = true;
         }
@@ -1631,12 +1657,11 @@ function validateBowlingOrders() {
       prev = val;
     }
     
-    // Pass 2: Check for 4-over maximum constraint
     for (let b in counts) {
       if (counts[b] > 4) {
         hasErrors = true;
         for (let i = 1; i <= 20; i++) {
-          const sel = document.getElementById(`bowl_${teamId}_${i}`);
+          const sel = document.getElementById(`bowl_${teamKey}_${i}`);
           if (sel && sel.value === b) {
             sel.classList.add('select-error');
           }
@@ -1645,7 +1670,6 @@ function validateBowlingOrders() {
     }
   });
 
-  // Inject or update warning text in modal footer
   let warnEl = document.getElementById('bowlWarning');
   if (!warnEl) {
     warnEl = document.createElement('span');
@@ -2186,15 +2210,6 @@ function buildPlayer(d) {
 window.addEventListener('DOMContentLoaded', async () => {
   populateSelects();
   await loadPlayerData();
-  document.getElementById('team1Select').addEventListener('change', () => { 
-    customBowlingOrders.t1 = []; 
-    try { localStorage.setItem('sackssim_bowling_orders', JSON.stringify(customBowlingOrders)); } catch(e) {}
-  });
-  
-  document.getElementById('team2Select').addEventListener('change', () => { 
-    customBowlingOrders.t2 = []; 
-    try { localStorage.setItem('sackssim_bowling_orders', JSON.stringify(customBowlingOrders)); } catch(e) {}
-  });
   // Show/hide speed selector when live toggle is flipped
   document.getElementById('liveToggle').addEventListener('click', () => {
     setTimeout(() => {
