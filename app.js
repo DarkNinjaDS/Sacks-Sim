@@ -1536,6 +1536,16 @@ function stopLive() {
 
 let customBowlingOrders = { t1: [], t2: [] };
 
+// Try to load saved bowling orders from localStorage
+try {
+  const savedOrders = JSON.parse(localStorage.getItem('sackssim_bowling_orders'));
+  if (savedOrders) {
+    customBowlingOrders = savedOrders;
+  }
+} catch (e) {
+  console.warn("Could not load custom bowling orders", e);
+}
+
 function openBowlingModal() {
   const t1key = document.getElementById('team1Select').value;
   const t2key = document.getElementById('team2Select').value;
@@ -1582,6 +1592,14 @@ function saveBowlingModal() {
     customBowlingOrders.t1[i - 1] = document.getElementById(`bowl_t1_${i}`).value;
     customBowlingOrders.t2[i - 1] = document.getElementById(`bowl_t2_${i}`).value;
   }
+  
+  // Save the new orders to localStorage
+  try {
+    localStorage.setItem('sackssim_bowling_orders', JSON.stringify(customBowlingOrders));
+  } catch (e) {
+    console.warn("Browser blocked saving to localStorage", e);
+  }
+  
   closeBowlingModal();
 }
 
@@ -2168,8 +2186,15 @@ function buildPlayer(d) {
 window.addEventListener('DOMContentLoaded', async () => {
   populateSelects();
   await loadPlayerData();
-  document.getElementById('team1Select').addEventListener('change', () => { customBowlingOrders.t1 = []; });
-  document.getElementById('team2Select').addEventListener('change', () => { customBowlingOrders.t2 = []; });
+  document.getElementById('team1Select').addEventListener('change', () => { 
+    customBowlingOrders.t1 = []; 
+    try { localStorage.setItem('sackssim_bowling_orders', JSON.stringify(customBowlingOrders)); } catch(e) {}
+  });
+  
+  document.getElementById('team2Select').addEventListener('change', () => { 
+    customBowlingOrders.t2 = []; 
+    try { localStorage.setItem('sackssim_bowling_orders', JSON.stringify(customBowlingOrders)); } catch(e) {}
+  });
   // Show/hide speed selector when live toggle is flipped
   document.getElementById('liveToggle').addEventListener('click', () => {
     setTimeout(() => {
