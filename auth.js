@@ -10,7 +10,7 @@
 const USERS = {
   aqua:   { password: 'aqua18',   access: 'master', team: 'aqua',   displayName: 'Aqua' },
   anuj:   { password: 'lenda45',   access: 'master', team: 'anuj',   displayName: 'Anuj' },
-  pranav: { password: 'agenda_merchant', access: 'master', team: null,     displayName: 'Pranav' },
+  pranav: { password: 'pranav123', access: 'master', team: null,     displayName: 'Pranav' },
   bhukla: { password: 'bhukla123', access: 'player', team: 'bhukla', displayName: 'Bhukla' },
   patake: { password: 'patake123', access: 'player', team: 'patake', displayName: 'Patake' },
 };
@@ -205,16 +205,19 @@ function showPlayerTeamSection() {
   const teamKey = currentUser.team;
   const teamName = TEAM_DISPLAY[teamKey] || teamKey;
   const roster = TEAM_ROSTERS[teamKey] || [];
-  const allPlayers = Object.keys(PLAYER_DB).sort();
+  // Only show players from this team's roster (team-specific XI)
+  const allPlayers = (TEAM_ROSTERS[teamKey] || Object.keys(PLAYER_DB)).slice().sort();
 
   container.style.display = 'block';
   container.innerHTML = `
     <div class="sidebar-section">
       <div class="sidebar-title">🎯 My Team — ${teamName}</div>
       <div style="font-size:0.72rem; color:var(--muted); font-family:'Space Mono',monospace; margin-bottom:12px;">
-        PLAYING XI <span style="color:var(--accent)">${roster.filter(Boolean).length}/11</span>
+        PLAYING XI <span style="color:var(--accent)" id="xiCountBadge">${roster.filter(Boolean).length}/11</span>
       </div>
       <div id="playingXiList" class="playing-xi-list"></div>
+      <div class="xi-bench-label">BENCH</div>
+      <div id="xiBenchList" class="xi-bench-list"></div>
       <button class="btn btn-primary" style="margin-top:12px; font-size:0.85rem;" onclick="savePlayingXi()">
         💾 Save Playing XI
       </button>
@@ -225,46 +228,214 @@ function showPlayerTeamSection() {
   renderPlayingXiEditor(teamKey, roster, allPlayers);
 }
 
+// ── internal drag state ──
+let _xiDragSrc = null;        // the element being dragged
+let _xiDragSrcZone = null;    // 'xi' | 'bench'
+let _xiCurrentOrder = [];     // live working copy of the XI (11 names)
+let _xiBench = [];            // players not in the XI
+
 function renderPlayingXiEditor(teamKey, roster, allPlayers) {
+  // Build working state
+  _xiCurrentOrder = Array.from({ length: 11 }, (_, i) => roster[i] || '').filter(Boolean);
+  // Bench = team players not currently in the XI
+  const inXi = new Set(_xiCurrentOrder);
+  _xiBench = allPlayers.filter(p => !inXi.has(p));
+
+  _rebuildXiDOM();
+  _rebuildBenchDOM();
+}
+
+function _rebuildXiDOM() {
   const list = document.getElementById('playingXiList');
   if (!list) return;
-
   list.innerHTML = '';
-  const slots = Array.from({ length: 11 }, (_, i) => roster[i] || '');
 
-  slots.forEach((player, i) => {
-    const row = document.createElement('div');
-    row.className = 'xi-slot';
-    row.innerHTML = `
-      <span class="xi-num">${i + 1}</span>
-      <select class="xi-select" id="xiSlot_${i}">
-        <option value="">— Select Player —</option>
-        ${allPlayers.map(p => `<option value="${p}" ${p === player ? 'selected' : ''}>${p}</option>`).join('')}
-      </select>
-    `;
+  _xiCurrentOrder.forEach((player, i) => {
+    const row = _makeXiRow(player, i);
     list.appendChild(row);
   });
+
+  // Drop zone at the bottom of XI (when dragging from bench with XI full, swap last)
+  list.addEventListener('dragover',  _onXiListDragOver);
+  list.addEventListener('drop',      _onXiListDrop);
+
+  _updateCountBadge();
+}
+
+function _rebuildBenchDOM() {
+  const bench = document.getElementById('xiBenchList');
+  if (!bench) return;
+  bench.innerHTML = '';
+
+  if (_xiBench.length === 0) {
+    bench.innerHTML = '<div style="font-size:0.7rem;color:var(--muted);font-family:\'Space Mono\',monospace;padding:6px 0;">All players in XI</div>';
+    return;
+  }
+
+  _xiBench.forEach(player => {
+    const pill = _makeBenchPill(player);
+    bench.appendChild(pill);
+  });
+
+  bench.addEventListener('dragover', e => e.preventDefault());
+  bench.addEventListener('drop',     _onBenchDrop);
+}
+
+function _makeXiRow(player, index) {
+  const row = document.createElement('div');
+  row.className = 'xi-slot xi-draggable';
+  row.draggable = true;
+  row.dataset.player = player;
+  row.dataset.index  = index;
+
+  row.innerHTML = `
+    <span class="xi-drag-handle">⠿</span>
+    <span class="xi-num">${index + 1}</span>
+    <span class="xi-name">${player}</span>
+    <button class="xi-remove-btn" title="Move to bench" onclick="(function(){_xiMoveXiToBench('${player.replace(/'/g,"\\'")}')})()">✕</button>
+  `;
+
+  row.addEventListener('dragstart', e => {
+    _xiDragSrc     = row;
+    _xiDragSrcZone = 'xi';
+    row.classList.add('xi-dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', player);
+  });
+  row.addEventListener('dragend', () => {
+    row.classList.remove('xi-dragging');
+    document.querySelectorAll('.xi-slot').forEach(r => r.classList.remove('xi-drag-over'));
+  });
+  row.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    document.querySelectorAll('.xi-slot').forEach(r => r.classList.remove('xi-drag-over'));
+    if (row !== _xiDragSrc) row.classList.add('xi-drag-over');
+  });
+  row.addEventListener('drop', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    row.classList.remove('xi-drag-over');
+    if (!_xiDragSrc) return;
+
+    if (_xiDragSrcZone === 'xi') {
+      // Reorder within XI
+      const fromIdx = parseInt(_xiDragSrc.dataset.index);
+      const toIdx   = parseInt(row.dataset.index);
+      if (fromIdx === toIdx) return;
+      const moved = _xiCurrentOrder.splice(fromIdx, 1)[0];
+      _xiCurrentOrder.splice(toIdx, 0, moved);
+      _rebuildXiDOM();
+    } else if (_xiDragSrcZone === 'bench') {
+      // Bench player dropped onto an XI slot → swap
+      const benchPlayer = e.dataTransfer.getData('text/plain');
+      const toIdx = parseInt(row.dataset.index);
+      const displaced = _xiCurrentOrder[toIdx];
+      _xiCurrentOrder[toIdx] = benchPlayer;
+      _xiBench = _xiBench.filter(p => p !== benchPlayer);
+      if (displaced) _xiBench.push(displaced);
+      _xiBench.sort();
+      _rebuildXiDOM();
+      _rebuildBenchDOM();
+    }
+    _xiDragSrc = null;
+  });
+
+  return row;
+}
+
+function _makeBenchPill(player) {
+  const pill = document.createElement('div');
+  pill.className = 'xi-bench-pill';
+  pill.draggable = true;
+  pill.dataset.player = player;
+  pill.textContent = player;
+
+  pill.addEventListener('dragstart', e => {
+    _xiDragSrc     = pill;
+    _xiDragSrcZone = 'bench';
+    pill.classList.add('xi-dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', player);
+  });
+  pill.addEventListener('dragend', () => {
+    pill.classList.remove('xi-dragging');
+  });
+
+  // Clicking a bench pill also adds to end of XI (if space), pushing last XI player to bench
+  pill.addEventListener('click', () => {
+    if (_xiCurrentOrder.length < 11) {
+      _xiCurrentOrder.push(player);
+      _xiBench = _xiBench.filter(p => p !== player);
+    } else {
+      // XI full — swap with last
+      const displaced = _xiCurrentOrder.pop();
+      _xiCurrentOrder.push(player);
+      _xiBench = _xiBench.filter(p => p !== player);
+      _xiBench.push(displaced);
+      _xiBench.sort();
+    }
+    _rebuildXiDOM();
+    _rebuildBenchDOM();
+  });
+
+  return pill;
+}
+
+function _onXiListDragOver(e) { e.preventDefault(); }
+
+function _onXiListDrop(e) {
+  // Dropped onto the list background (not on a specific row)
+  e.preventDefault();
+  if (!_xiDragSrc || _xiDragSrcZone !== 'bench') return;
+  const benchPlayer = e.dataTransfer.getData('text/plain');
+  if (_xiCurrentOrder.length < 11) {
+    _xiCurrentOrder.push(benchPlayer);
+    _xiBench = _xiBench.filter(p => p !== benchPlayer);
+  } else {
+    const displaced = _xiCurrentOrder.pop();
+    _xiCurrentOrder.push(benchPlayer);
+    _xiBench = _xiBench.filter(p => p !== benchPlayer);
+    _xiBench.push(displaced);
+    _xiBench.sort();
+  }
+  _rebuildXiDOM();
+  _rebuildBenchDOM();
+  _xiDragSrc = null;
+}
+
+function _onBenchDrop(e) {
+  // XI player dragged to bench → move to bench
+  e.preventDefault();
+  if (!_xiDragSrc || _xiDragSrcZone !== 'xi') return;
+  const player = e.dataTransfer.getData('text/plain');
+  _xiMoveXiToBench(player);
+  _xiDragSrc = null;
+}
+
+function _xiMoveXiToBench(player) {
+  _xiCurrentOrder = _xiCurrentOrder.filter(p => p !== player);
+  if (!_xiBench.includes(player)) { _xiBench.push(player); _xiBench.sort(); }
+  _rebuildXiDOM();
+  _rebuildBenchDOM();
+}
+
+function _updateCountBadge() {
+  const badge = document.getElementById('xiCountBadge');
+  if (badge) badge.textContent = `${_xiCurrentOrder.length}/11`;
 }
 
 function savePlayingXi() {
   if (!currentUser || !currentUser.team) return;
   const teamKey = currentUser.team;
 
-  const newXi = [];
-  for (let i = 0; i < 11; i++) {
-    const sel = document.getElementById(`xiSlot_${i}`);
-    if (sel && sel.value) newXi.push(sel.value);
-    else newXi.push('');
-  }
-
-  const filled = newXi.filter(Boolean);
-  if (filled.length < 11) {
-    const missing = 11 - filled.length;
+  if (_xiCurrentOrder.length < 11) {
+    const missing = 11 - _xiCurrentOrder.length;
     if (!confirm(`You have ${missing} empty slot(s). Save anyway?`)) return;
   }
 
-  // Update the global roster
-  TEAM_ROSTERS[teamKey] = newXi.filter(Boolean);
+  // Update the global roster with the live drag-ordered list
+  TEAM_ROSTERS[teamKey] = [..._xiCurrentOrder];
 
   // Show save message
   const msg = document.getElementById('xiSaveMsg');
@@ -302,6 +473,4 @@ function initAuth() {
 }
 
 // Run auth init after DOM is ready
-
 document.addEventListener('DOMContentLoaded', initAuth);
-
