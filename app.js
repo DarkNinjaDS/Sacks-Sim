@@ -7,46 +7,42 @@
 // ===================================================
 
 const TEAM_COLORS = {
-  anuj: '#c4c4c4', aqua: '#00adbf', patake: '#281c6c',
-  pranav: '#1d54aa', indiamasters: '#00008b', worldteststars: '#dcdcdc',
-  wpl: '#ff69b4', psl: '#006400', cpl: '#800080',
-  bblxi: '#323232', eclxi: '#8b0000', bhukla: '#a52a2a',
-  u19: '#add8e6', worldmasters: '#daa520', scoutxi: '#228b22',
-  soldxi: '#4b0082', prisonxi: '#808080', undraftedxi: '#708090',
-  unsoldxi: '#c0c0c0', psk: '#cccc00',
-  // Group teams
+  // User Teams
+  aqua: '#00adbf', bhukla: '#a52a2a', patake: '#6a0dad', 
+  anuj: '#006400', pranav: '#ff6600',
+  // CPU/Group Teams
   southafrica: '#007a4d', rcbat: '#e01f2b', thehundred: '#00b2a9',
   australia:   '#f9be00', miat:   '#004c93', hydat:      '#f26522',
-  spdoxxers:   '#6a0dad', newzealand: '#555555', kkrat: '#3a225d', sa20: '#ef3340',
-  asadlahori:  '#006400', england: '#00247d', rrat: '#ea1e8c', punat: '#d71921',
-  agendadoval: '#ff6600', india: '#1a237e', cskat: '#f7a721', delat: '#3d5afe',
+  newzealand: '#555555', kkrat: '#3a225d', sa20: '#ef3340',
+  england: '#00247d', rrat: '#ea1e8c', punat: '#d71921',
+  india: '#1a237e', cskat: '#f7a721', delat: '#3d5afe',
 };
 
 const TEAM_DISPLAY = {
-  anuj: 'Anuj XI', aqua: 'Aqua Rehman Bangal', bhukla: 'Major Bhukla', patake: 'Patake XI',
-  // Group A
+  // User Teams
+  aqua: 'Aqua Rehman Bangal', 
+  bhukla: 'Major Bhukla', 
+  patake: 'SP Doxxers', 
+  anuj: 'Asad Lahori', 
+  pranav: 'Agenda Doval',
+  // CPU/Group Teams
   southafrica: 'South Africa', rcbat: 'RCB AT', thehundred: 'The Hundred',
-  // Group B
   australia: 'Australia', miat: 'MI AT', hydat: 'HYD AT',
-  // Group C
-  spdoxxers: 'SP Doxxers', newzealand: 'New Zealand', kkrat: 'KKR AT', sa20: 'SA20',
-  // Group D
-  asadlahori: 'Asad Lahori', england: 'England', rrat: 'RR AT', punat: 'PUN AT',
-  // Group E
-  agendadoval: 'Agenda Doval', india: 'India', cskat: 'CSK AT', delat: 'DEL AT',
+  newzealand: 'New Zealand', kkrat: 'KKR AT', sa20: 'SA20',
+  england: 'England', rrat: 'RR AT', punat: 'PUN AT',
+  india: 'India', cskat: 'CSK AT', delat: 'DEL AT',
 };
 
 // ===================================================
 //   TOURNAMENT GROUPS
-//   Maps group labels → array of team keys
 // ===================================================
 
 const TOURNAMENT_GROUPS = {
   'Group A': ['aqua', 'southafrica', 'rcbat', 'thehundred'],
   'Group B': ['bhukla', 'australia', 'miat', 'hydat'],
-  'Group C': ['spdoxxers', 'newzealand', 'kkrat', 'sa20'],
-  'Group D': ['asadlahori', 'england', 'rrat', 'punat'],
-  'Group E': ['agendadoval', 'india', 'cskat', 'delat'],
+  'Group C': ['patake', 'newzealand', 'kkrat', 'sa20'],
+  'Group D': ['anuj', 'england', 'rrat', 'punat'],
+  'Group E': ['pranav', 'india', 'cskat', 'delat'],
 };
 
 // Reverse map: team key → group name
@@ -54,6 +50,7 @@ const TEAM_TO_GROUP = {};
 Object.entries(TOURNAMENT_GROUPS).forEach(([group, teams]) => {
   teams.forEach(t => { TEAM_TO_GROUP[t] = group; });
 });
+
 
 const STADIUMS = {
   'MCG, Melbourne':              { pace:1.1, spin:0.9, outfield:1.0, dew:0.10, pitch:'balanced' },
