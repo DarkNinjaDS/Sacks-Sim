@@ -429,18 +429,17 @@ function _updateCountBadge() {
 
 function savePlayingXi() {
   if (!currentUser || !currentUser.team) return;
-  const teamKey = currentUser.team;
-  const normalizedKey = normalizeTeamKey(teamKey);
+  const teamKey = currentUser.team; // No need for normalizeTeamKey anymore!
 
   if (_xiCurrentOrder.length < 11) {
     const missing = 11 - _xiCurrentOrder.length;
     if (!confirm(`You have ${missing} empty slot(s). Save anyway?`)) return;
   }
 
-  // Save selection using the normalized key variant
-  TEAM_ROSTERS[normalizedKey] = [..._xiCurrentOrder];
+  // Save selection using the user's direct team key
+  TEAM_ROSTERS[teamKey] = [..._xiCurrentOrder];
 
-  // NEW: Save the updated rosters globally to localStorage
+  // Save the updated rosters globally to localStorage
   try {
     localStorage.setItem('sackssim_rosters', JSON.stringify(TEAM_ROSTERS));
   } catch (e) {
@@ -454,23 +453,7 @@ function savePlayingXi() {
     setTimeout(() => { msg.style.display = 'none'; }, 2500);
   }
 
-  console.log(`[AUTH] ${currentUser.displayName} updated & saved ${normalizedKey} Playing XI.`);
-}
-  // NEW: Save the updated rosters globally to localStorage
-  try {
-    localStorage.setItem('sackssim_rosters', JSON.stringify(TEAM_ROSTERS));
-  } catch (e) {
-    console.warn("Browser blocked saving to localStorage", e);
-  }
-
-  // Show save message
-  const msg = document.getElementById('xiSaveMsg');
-  if (msg) {
-    msg.style.display = 'block';
-    setTimeout(() => { msg.style.display = 'none'; }, 2500);
-  }
-
-  console.log(`[AUTH] ${currentUser.displayName} updated & saved ${normalizedKey} Playing XI.`);
+  console.log(`[AUTH] ${currentUser.displayName} updated & saved ${teamKey} Playing XI.`);
 }
 
 // ===================================================
