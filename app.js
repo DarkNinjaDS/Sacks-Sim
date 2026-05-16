@@ -75,364 +75,114 @@ const STADIUMS = {
 
 // Pre-defined 11-player rosters (keys must match PLAYER_DB names)
 const TEAM_ROSTERS = {
-    // ==========================================
-    // Group A: Aqua Rehman Bangal - South Africa - RCB AT - The Hundred
-    // ==========================================
-    "Aqua": [
-        "Travis Head",
-        "Abhishek Sharma",
-        "Heinrich Klaasen",
-        "Nicholas Pooran",
-        "Mitchell Marsh",
-        "Rishabh Pant",
-        "Wanindu Hasaranga",
-        "Harshal Patel",
-        "Mohammad Shami",
-        "Pat Cummins",
-        "Avesh Khan",
-        "Ishan Kishan",
-        "Liam Livingstone",
-        "Mohsin Khan",
-        "Aiden Markram"
+    // Group A
+    "aqua": [
+        "Travis Head", "Abhishek Sharma", "Heinrich Klaasen", "Nicholas Pooran", "Mitchell Marsh",
+        "Rishabh Pant", "Wanindu Hasaranga", "Harshal Patel", "Mohammad Shami", "Pat Cummins",
+        "Avesh Khan", "Ishan Kishan", "Liam Livingstone", "Mohsin Khan", "Aiden Markram"
     ],
-    "South Africa": [
-        "Aiden Markram",
-        "Quinton de Kock",
-        "Ryan Rickelton",
-        "Dewald Brevis",
-        "Tristan Stubbs",
-        "David Miller",
-        "Marco Jansen",
-        "George Linde",
-        "Keshav Maharaj",
-        "Kagiso Rabada",
-        "Anrich Nortje",
-        "Jason Smith",
-        "Corbin Bosch",
-        "Kwena Maphaka",
-        "Lungi Ngidi"
+    "southafrica": [
+        "Aiden Markram", "Quinton de Kock", "Ryan Rickelton", "Dewald Brevis", "Tristan Stubbs",
+        "David Miller", "Marco Jansen", "George Linde", "Keshav Maharaj", "Kagiso Rabada",
+        "Anrich Nortje", "Jason Smith", "Corbin Bosch", "Kwena Maphaka", "Lungi Ngidi"
     ],
-    "RCB All Time": [
-        "Virat Kohli",
-        "Chris Gayle",
-        "Devdutt Padikkal",
-        "AB de Villiers",
-        "Glenn Maxwell",
-        "Dinesh Karthik",
-        "Jitesh Sharma",
-        "Harshal Patel",
-        "Anil Kumble",
-        "Josh Hazlewood",
-        "Yuzvendra Chahal",
-        "Faf du Plessis",
-        "Rajat Patidar",
-        "Wanindu Hasaranga",
-        "Mohammed Siraj"
+    "rcbat": [
+        "Virat Kohli", "Chris Gayle", "Devdutt Padikkal", "AB de Villiers", "Glenn Maxwell",
+        "Dinesh Karthik", "Jitesh Sharma", "Harshal Patel", "Anil Kumble", "Josh Hazlewood",
+        "Yuzvendra Chahal", "Faf du Plessis", "Rajat Patidar", "Wanindu Hasaranga", "Mohammed Siraj"
     ],
-    "The Hundred": [
-        "Phil Salt",
-        "Will Jacks",
-        "Jos Buttler",
-        "Jordan Cox",
-        "Harry Brook",
-        "Liam Livingstone",
-        "Sam Curran",
-        "Rashid Khan",
-        "Adil Rashid",
-        "Adam Milne",
-        "Tymal Mills",
-        "Ben Duckett",
-        "James Vince",
-        "Benny Howell",
-        "Chris Jordan"
+    "thehundred": [
+        "Phil Salt", "Will Jacks", "Jos Buttler", "Jordan Cox", "Harry Brook",
+        "Liam Livingstone", "Sam Curran", "Rashid Khan", "Adil Rashid", "Adam Milne",
+        "Tymal Mills", "Ben Duckett", "James Vince", "Benny Howell", "Chris Jordan"
     ],
 
-    // ==========================================
-    // Group B: Major Bhukla - Australia - MI AT - HYD AT
-    // ==========================================
-    "Om": [
-        "Jordan Cox",
-        "Phil Salt",
-        "Virat Kohli",
-        "Ruturaj Gaikwad",
-        "Sanju Samson",
-        "Shivam Dube",
-        "Josh Hazlewood",
-        "Noor Ahmad",
-        "Khaleel Ahmed",
-        "Bhuvneshwar Kumar",
-        "Krunal Pandya",
-        "Jacob Duffy",
-        "Rajat Patidar",
-        "Tim David",
-        "Matt Short"
+    // Group B
+    "bhukla": [
+        "Jordan Cox", "Phil Salt", "Virat Kohli", "Ruturaj Gaikwad", "Sanju Samson",
+        "Shivam Dube", "Josh Hazlewood", "Noor Ahmad", "Khaleel Ahmed", "Bhuvneshwar Kumar",
+        "Krunal Pandya", "Jacob Duffy", "Rajat Patidar", "Tim David", "Matt Short"
     ],
-    "Australia": [
-        "Travis Head",
-        "Mitchell Marsh",
-        "Josh Inglis",
-        "Cameron Green",
-        "Tim David",
-        "Marcus Stoinis",
-        "Glenn Maxwell",
-        "Ben Dwarshuis",
-        "Nathan Ellis",
-        "Xavier Bartlett",
-        "Adam Zampa",
-        "Matt Renshaw",
-        "Cooper Connolly",
-        "Matthew Kuhnemann",
-        "Steve Smith"
+    "australia": [
+        "Travis Head", "Mitchell Marsh", "Josh Inglis", "Cameron Green", "Tim David",
+        "Marcus Stoinis", "Glenn Maxwell", "Ben Dwarshuis", "Nathan Ellis", "Xavier Bartlett",
+        "Adam Zampa", "Matt Renshaw", "Cooper Connolly", "Matthew Kuhnemann", "Steve Smith"
     ],
-    "MI All Time": [
-        "Rohit Sharma",
-        "Quinton de Kock",
-        "Suryakumar Yadav",
-        "Ishan Kishan",
-        "Hardik Pandya",
-        "Kieron Pollard",
-        "Krunal Pandya",
-        "Harbhajan Singh",
-        "Trent Boult",
-        "Jasprit Bumrah",
-        "Lasith Malinga",
-        "Sachin Tendulkar",
-        "Tilak Varma",
-        "Rahul Chahar",
-        "Mitchell McClenaghan"
+    "miat": [
+        "Rohit Sharma", "Quinton de Kock", "Suryakumar Yadav", "Ishan Kishan", "Hardik Pandya",
+        "Kieron Pollard", "Krunal Pandya", "Harbhajan Singh", "Trent Boult", "Jasprit Bumrah",
+        "Lasith Malinga", "Sachin Tendulkar", "Tilak Varma", "Rahul Chahar", "Mitchell McClenaghan"
     ],
-    "Hyderabad All Time": [
-        "David Warner",
-        "Shikhar Dhawan",
-        "Kane Williamson",
-        "Manish Pandey",
-        "Andrew Symonds",
-        "Heinrich Klaasen",
-        "Jason Holder",
-        "Rashid Khan",
-        "Bhuvneshwar Kumar",
-        "T. Natarajan",
-        "Dale Steyn",
-        "Jonny Bairstow",
-        "Rohit Sharma",
-        "Pragyan Ojha",
-        "RP Singh"
+    "hydat": [
+        "David Warner", "Shikhar Dhawan", "Kane Williamson", "Manish Pandey", "Andrew Symonds",
+        "Heinrich Klaasen", "Jason Holder", "Rashid Khan", "Bhuvneshwar Kumar", "T. Natarajan",
+        "Dale Steyn", "Jonny Bairstow", "Rohit Sharma", "Pragyan Ojha", "RP Singh"
     ],
 
-    // ==========================================
-    // Group C: SP Doxxers - New Zealand - KKR AT - SA20
-    // ==========================================
-    "Patake XI": [
-        "Tim Seifert",
-        "Shubman Gill",
-        "Sai Sudarshan",
-        "Jos Buttler",
-        "Cameron Green",
-        "Rinku Singh",
-        "Sunil Narine",
-        "Rashid Khan",
-        "Jason Holder",
-        "Varun Chakravarthy",
-        "Matheesha Pathirana",
-        "Mohammad Siraj",
-        "Finn Allen",
-        "Kagiso Rabada",
-        "Harshit Rana"
+    // Group C
+    "patake": [
+        "Tim Seifert", "Shubman Gill", "Sai Sudarshan", "Jos Buttler", "Cameron Green",
+        "Rinku Singh", "Sunil Narine", "Rashid Khan", "Jason Holder", "Varun Chakravarthy",
+        "Matheesha Pathirana", "Mohammad Siraj", "Finn Allen", "Kagiso Rabada", "Harshit Rana"
     ],
-    "New Zealand": [
-        "Finn Allen",
-        "Tim Seifert",
-        "Rachin Ravindra",
-        "Glenn Phillips",
-        "Daryl Mitchell",
-        "Mark Chapman",
-        "James Neesham",
-        "Mitchell Santner",
-        "Kyle Jamieson",
-        "Jacob Duffy",
-        "Matt Henry",
-        "Devon Conway",
-        "Cole McConchie",
-        "Ish Sodhi",
-        "Lockie Ferguson"
+    "newzealand": [
+        "Finn Allen", "Tim Seifert", "Rachin Ravindra", "Glenn Phillips", "Daryl Mitchell",
+        "Mark Chapman", "James Neesham", "Mitchell Santner", "Kyle Jamieson", "Jacob Duffy",
+        "Matt Henry", "Devon Conway", "Cole McConchie", "Ish Sodhi", "Lockie Ferguson"
     ],
-    "KKR All Time": [
-        "Chris Lynn",
-        "Sunil Narine",
-        "Gautam Gambhir",
-        "Robin Uthappa",
-        "Rinku Singh",
-        "Yusuf Pathan",
-        "Andre Russell",
-        "Piyush Chawla",
-        "Harshit Rana",
-        "Umesh Yadav",
-        "Varun Chakravarthy",
-        "Nitish Rana",
-        "Jacques Kallis",
-        "Dinesh Karthik",
-        "Morne Morkel"
+    "kkrat": [
+        "Chris Lynn", "Sunil Narine", "Gautam Gambhir", "Robin Uthappa", "Rinku Singh",
+        "Yusuf Pathan", "Andre Russell", "Piyush Chawla", "Harshit Rana", "Umesh Yadav",
+        "Varun Chakravarthy", "Nitish Rana", "Jacques Kallis", "Dinesh Karthik", "Morne Morkel"
     ],
-    "SA 20": [
-        "Ryan Rickelton",
-        "Will Jacks",
-        "Aiden Markram",
-        "Rassie van der Dussen",
-        "Heinrich Klaasen",
-        "Tristan Stubbs",
-        "Marco Jansen",
-        "George Linde",
-        "Bjorn Fortuin",
-        "Kagiso Rabada",
-        "Ottneil Baartman",
-        "Leus du Plooy",
-        "Dewald Brevis",
-        "Keshav Maharaj",
-        "Anrich Nortje"
+    "sa20": [
+        "Ryan Rickelton", "Will Jacks", "Aiden Markram", "Rassie van der Dussen", "Heinrich Klaasen",
+        "Tristan Stubbs", "Marco Jansen", "George Linde", "Bjorn Fortuin", "Kagiso Rabada",
+        "Ottneil Baartman", "Leus du Plooy", "Dewald Brevis", "Keshav Maharaj", "Anrich Nortje"
     ],
 
-    // ==========================================
-    // Group D: Asad Lahori - England - RR AT - PUN AT
-    // ==========================================
-    "Anuj": [
-        "Yashasvi Jaiswal",
-        "Ryan Rickelton",
-        "Will Jacks",
-        "Suryakumar Yadav",
-        "Tilak Verma",
-        "Riyan Parag",
-        "Shimron Hetmyer",
-        "Donovan Ferreria",
-        "Hardik Pandya",
-        "Ravindra Jadeja",
-        "Mitchell Santner",
-        "Jasprit Bumrah",
-        "Trent Boult",
-        "Tushar Deshpande",
-        "Ravi Bishnoi"
+    // Group D
+    "anuj": [
+        "Yashasvi Jaiswal", "Ryan Rickelton", "Will Jacks", "Suryakumar Yadav", "Tilak Verma",
+        "Riyan Parag", "Shimron Hetmyer", "Donovan Ferreria", "Hardik Pandya", "Ravindra Jadeja",
+        "Mitchell Santner", "Jasprit Bumrah", "Trent Boult", "Tushar Deshpande", "Ravi Bishnoi"
     ],
-    "England": [
-        "Phil Salt",
-        "Ben Duckett",
-        "Jos Buttler",
-        "Tom Banton",
-        "Harry Brook",
-        "Will Jacks",
-        "Sam Curran",
-        "Liam Dawson",
-        "Jofra Archer",
-        "Adil Rashid",
-        "Luke Wood",
-        "Jacob Bethell",
-        "Jamie Overton",
-        "Rehan Ahmed",
-        "Josh Tongue"
+    "england": [
+        "Phil Salt", "Ben Duckett", "Jos Buttler", "Tom Banton", "Harry Brook",
+        "Will Jacks", "Sam Curran", "Liam Dawson", "Jofra Archer", "Adil Rashid",
+        "Luke Wood", "Jacob Bethell", "Jamie Overton", "Rehan Ahmed", "Josh Tongue"
     ],
-    "RR All Time": [
-        "Jos Buttler",
-        "Yashasvi Jaiswal",
-        "Sanju Samson",
-        "Shane Watson",
-        "Yusuf Pathan",
-        "Shimron Hetmyer",
-        "James Faulkner",
-        "Jofra Archer",
-        "Shane Warne",
-        "Yuzvendra Chahal",
-        "Siddharth Trivedi",
-        "Ajinkya Rahane",
-        "Riyan Parag",
-        "Shreyas Gopal",
-        "Trent Boult"
+    "rrat": [
+        "Jos Buttler", "Yashasvi Jaiswal", "Sanju Samson", "Shane Watson", "Yusuf Pathan",
+        "Shimron Hetmyer", "James Faulkner", "Jofra Archer", "Shane Warne", "Yuzvendra Chahal",
+        "Siddharth Trivedi", "Ajinkya Rahane", "Riyan Parag", "Shreyas Gopal", "Trent Boult"
     ],
-    "Punjab All Time": [
-        "KL Rahul",
-        "Shaun Marsh",
-        "Shreyas Iyer",
-        "Glenn Maxwell",
-        "David Miller",
-        "Shashank Singh",
-        "Irfan Pathan",
-        "Axar Patel",
-        "Piyush Chawla",
-        "Arshdeep Singh",
-        "Sandeep Sharma",
-        "Mayank Agarwal",
-        "Liam Livingstone",
-        "Ravi Bishnoi",
-        "Mohammed Shami"
+    "punat": [
+        "KL Rahul", "Shaun Marsh", "Shreyas Iyer", "Glenn Maxwell", "David Miller",
+        "Shashank Singh", "Irfan Pathan", "Axar Patel", "Piyush Chawla", "Arshdeep Singh",
+        "Sandeep Sharma", "Mayank Agarwal", "Liam Livingstone", "Ravi Bishnoi", "Mohammed Shami"
     ],
 
-    // ==========================================
-    // Group E: Agenda Doval - India - CSK AT - DEL AT
-    // ==========================================
-    "Pranav": [
-        "KL Rahul",
-        "Pathum Nissanka",
-        "Prabhsimran Singh",
-        "Shreyas Iyer",
-        "Cooper Connolly",
-        "Shashank Singh",
-        "David Miller",
-        "Tristan Stubbs",
-        "Marcus Stoinis",
-        "Axar Patel",
-        "Ben Dwarshuis",
-        "Arshdeep Singh",
-        "T Natarajan",
-        "Kuldeep Yadav",
-        "Yuzvendra Chahal"
+    // Group E
+    "pranav": [
+        "KL Rahul", "Pathum Nissanka", "Prabhsimran Singh", "Shreyas Iyer", "Cooper Connolly",
+        "Shashank Singh", "David Miller", "Tristan Stubbs", "Marcus Stoinis", "Axar Patel",
+        "Ben Dwarshuis", "Arshdeep Singh", "T Natarajan", "Kuldeep Yadav", "Yuzvendra Chahal"
     ],
-    "India": [
-        "Abhishek Sharma",
-        "Ishan Kishan",
-        "Tilak Varma",
-        "Suryakumar Yadav",
-        "Hardik Pandya",
-        "Shivam Dube",
-        "Rinku Singh",
-        "Axar Patel",
-        "Arshdeep Singh",
-        "Jasprit Bumrah",
-        "Varun Chakravarthy",
-        "Sanju Samson",
-        "Washington Sundar",
-        "Kuldeep Yadav",
-        "Mohammed Siraj"
+    "india": [
+        "Abhishek Sharma", "Ishan Kishan", "Tilak Varma", "Suryakumar Yadav", "Hardik Pandya",
+        "Shivam Dube", "Rinku Singh", "Axar Patel", "Arshdeep Singh", "Jasprit Bumrah",
+        "Varun Chakravarthy", "Sanju Samson", "Washington Sundar", "Kuldeep Yadav", "Mohammed Siraj"
     ],
-    "CSK All Time": [
-        "Faf du Plessis",
-        "Ruturaj Gaikwad",
-        "Suresh Raina",
-        "Ambati Rayudu",
-        "MS Dhoni",
-        "Ravindra Jadeja",
-        "Albie Morkel",
-        "Dwayne Bravo",
-        "Ravichandran Ashwin",
-        "Deepak Chahar",
-        "Mohit Sharma",
-        "Shane Watson",
-        "Shivam Dube",
-        "Imran Tahir",
-        "Matheesha Pathirana"
+    "cskat": [
+        "Faf du Plessis", "Ruturaj Gaikwad", "Suresh Raina", "Ambati Rayudu", "MS Dhoni",
+        "Ravindra Jadeja", "Albie Morkel", "Dwayne Bravo", "Ravichandran Ashwin", "Deepak Chahar",
+        "Mohit Sharma", "Shane Watson", "Shivam Dube", "Imran Tahir", "Matheesha Pathirana"
     ],
-    "Delhi All Time": [
-        "Virender Sehwag",
-        "Shikhar Dhawan",
-        "Shreyas Iyer",
-        "Rishabh Pant",
-        "JP Duminy",
-        "Tristan Stubbs",
-        "Axar Patel",
-        "Chris Morris",
-        "Amit Mishra",
-        "Kagiso Rabada",
-        "Morne Morkel",
-        "David Warner",
-        "Marcus Stoinis",
-        "Kuldeep Yadav",
-        "Ashish Nehra"
+    "delat": [
+        "Virender Sehwag", "Shikhar Dhawan", "Shreyas Iyer", "Rishabh Pant", "JP Duminy",
+        "Tristan Stubbs", "Axar Patel", "Chris Morris", "Amit Mishra", "Kagiso Rabada",
+        "Morne Morkel", "David Warner", "Marcus Stoinis", "Kuldeep Yadav", "Ashish Nehra"
     ]
 };
 
