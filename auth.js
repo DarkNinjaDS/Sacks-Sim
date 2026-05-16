@@ -430,14 +430,22 @@ function _updateCountBadge() {
 function savePlayingXi() {
   if (!currentUser || !currentUser.team) return;
   const teamKey = currentUser.team;
+  const normalizedKey = normalizeTeamKey(teamKey);
 
   if (_xiCurrentOrder.length < 11) {
     const missing = 11 - _xiCurrentOrder.length;
     if (!confirm(`You have ${missing} empty slot(s). Save anyway?`)) return;
   }
 
-  // Update the global roster with the live drag-ordered list
-  TEAM_ROSTERS[teamKey] = [..._xiCurrentOrder];
+  // Save selection using the normalized key variant
+  TEAM_ROSTERS[normalizedKey] = [..._xiCurrentOrder];
+
+  // NEW: Save the updated rosters globally to localStorage
+  try {
+    localStorage.setItem('sackssim_rosters', JSON.stringify(TEAM_ROSTERS));
+  } catch (e) {
+    console.warn("Browser blocked saving to localStorage", e);
+  }
 
   // Show save message
   const msg = document.getElementById('xiSaveMsg');
@@ -446,7 +454,7 @@ function savePlayingXi() {
     setTimeout(() => { msg.style.display = 'none'; }, 2500);
   }
 
-  console.log(`[AUTH] ${currentUser.displayName} updated ${teamKey} Playing XI:`, TEAM_ROSTERS[teamKey]);
+  console.log(`[AUTH] ${currentUser.displayName} updated & saved ${normalizedKey} Playing XI.`);
 }
 
 // ===================================================
