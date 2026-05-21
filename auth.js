@@ -486,9 +486,12 @@ function _updateCountBadge() {
   if (badge) badge.textContent = `${_xiCurrentOrder.length}/11`;
 }
 
-function savePlayingXi() {
-  if (!currentUser || !currentUser.team) return;
-  const teamKey = currentUser.team; // No need for normalizeTeamKey anymore!
+function savePlayingXi(targetTeamKey) {
+  if (!currentUser) return;
+  
+  // Use the explicitly passed team key (from the master dropdown), or fallback to the player's team
+  const teamKey = targetTeamKey || currentUser.team;
+  if (!teamKey) return; // No need for normalizeTeamKey anymore!
 
   if (_xiCurrentOrder.length < 11) {
     const missing = 11 - _xiCurrentOrder.length;
