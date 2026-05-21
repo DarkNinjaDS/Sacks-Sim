@@ -234,29 +234,52 @@ function updateUserBadge() {
 //   PLAYING XI MANAGEMENT (Player feature)
 // ===================================================
 
-function showPlayerTeamSection() {
+function showPlayerTeamSection(selectedTeamKey) {
   const container = document.getElementById('playerTeamSection');
-  if (!container || !currentUser || !currentUser.team) return;
+  if (!container || !currentUser) return;
 
-  const teamKey = currentUser.team;
+  const isMaster = currentUser.access === 'master';
+  
+  // Determine which team to edit: Master's selected team > User's own team > Default 'aqua'
+  const teamKey = selectedTeamKey || currentUser.team || 'aqua';
+  
+  // Safety check for players without a team
+  if (!isMaster && !currentUser.team) return;
+
   const teamName = TEAM_DISPLAY[teamKey] || teamKey;
   const roster = TEAM_ROSTERS[teamKey] || [];
-  
-  // FIX: Force the pool to STRICTLY be the 15 players assigned to this team
-  // No falling back to Object.keys(PLAYER_DB) anymore
   const allPlayers = roster.slice().sort();
+
+  // If master, generate a dropdown to choose the team
+  let masterControls = '';
+  if (isMaster) {
+    const options = Object.keys(TEAM_DISPLAY).map(k => 
+      `<option value="${k}" ${k === teamKey ? 'selected' : ''}>${TEAM_DISPLAY[k]}</option>`
+    ).join('');
+    
+    masterControls = `
+      <div style="margin-bottom: 12px;">
+        <label style="color:var(--accent);">Select Team to Edit</label>
+        <select id="masterXiSelect" onchange="showPlayerTeamSection(this.value)" style="margin-bottom:0; padding:6px 10px;">
+          ${options}
+        </select>
+      </div>
+    `;
+  }
 
   container.style.display = 'block';
   container.innerHTML = `
     <div class="sidebar-section">
-      <div class="sidebar-title">🎯 My Team — ${teamName}</div>
+      <div class="sidebar-title">🎯 ${isMaster ? 'Master Team Editor' : 'My Team — ' + teamName}</div>
+      ${masterControls}
       <div style="font-size:0.72rem; color:var(--muted); font-family:'Space Mono',monospace; margin-bottom:12px;">
-        PLAYING XI <span style="color:var(--accent)" id="xiCountBadge">${roster.filter(Boolean).length}/11</span>
+        PLAYING XI ${isMaster ? '— <span style="color:var(--text)">' + teamName + '</span>' : ''} 
+        <span style="color:var(--accent)" id="xiCountBadge">${roster.filter(Boolean).length}/11</span>
       </div>
       <div id="playingXiList" class="playing-xi-list"></div>
       <div class="xi-bench-label">BENCH</div>
       <div id="xiBenchList" class="xi-bench-list"></div>
-      <button class="btn btn-primary" style="margin-top:12px; font-size:0.85rem;" onclick="savePlayingXi()">
+      <button class="btn btn-primary" style="margin-top:12px; font-size:0.85rem;" onclick="savePlayingXi('${teamKey}')">
         💾 Save Playing XI
       </button>
       <div id="xiSaveMsg" style="display:none; margin-top:8px; font-family:'Space Mono',monospace; font-size:0.7rem; color:var(--accent3);">✓ Playing XI saved!</div>
