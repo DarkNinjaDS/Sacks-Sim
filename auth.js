@@ -189,8 +189,9 @@ function applyAccessRestrictions() {
 
   // Sidebar: hide sim controls for players but show team management
 
-  // Show "My Team" section for players
-  if (!isMaster && currentUser.team) {
+   
+  // Show Team Management section for all valid users
+  if (isMaster || currentUser.team) {
     showPlayerTeamSection();
   }
 }
