@@ -1699,25 +1699,25 @@ function saveBowlingModal() {
   const canEditT1 = isMaster || (currentUser && currentUser.team === t1key);
   const canEditT2 = isMaster || (currentUser && currentUser.team === t2key);
 
-  // Only save the columns the user actually has permission to edit
   if (canEditT1) {
     customBowlingOrders[t1key] = [];
-    for (let i = 1; i <= 20; i++) {
-      customBowlingOrders[t1key].push(document.getElementById(`bowl_${t1key}_${i}`).value);
-    }
+    for (let i = 1; i <= 20; i++) customBowlingOrders[t1key].push(document.getElementById(`bowl_${t1key}_${i}`).value);
   }
   
   if (canEditT2) {
     customBowlingOrders[t2key] = [];
-    for (let i = 1; i <= 20; i++) {
-      customBowlingOrders[t2key].push(document.getElementById(`bowl_${t2key}_${i}`).value);
-    }
+    for (let i = 1; i <= 20; i++) customBowlingOrders[t2key].push(document.getElementById(`bowl_${t2key}_${i}`).value);
   }
   
   try {
     localStorage.setItem('sackssim_bowling_orders', JSON.stringify(customBowlingOrders));
   } catch (e) {
     console.warn("Browser blocked saving to localStorage", e);
+  }
+  
+  // --- ADDED FIREBASE SYNC ---
+  if (window.db) {
+    window.dbSet(window.dbRef(window.db, 'bowling_orders'), customBowlingOrders);
   }
   
   closeBowlingModal();
@@ -1930,20 +1930,31 @@ function saveMatchToLog(data) {
   }
 }
 
-function clearMatchLog() {
-  // Bypassing browser 'confirm' popups to ensure it always fires
-  try { localStorage.removeItem('iplSimLog'); } catch(e) {}
-  memoryLog = [];
-  renderDashboard(); // Instantly clears the screen
-}
-
 function deleteMatch(id, event) {
-  event.stopPropagation(); // Prevents opening the match when clicking X
+  event.stopPropagation(); 
   let log = getMatchLog();
   log = log.filter(m => m.id !== id);
   memoryLog = log;
   try { localStorage.setItem('iplSimLog', JSON.stringify(log)); } catch(e) {}
-  renderDashboard(); // Instantly refreshes the screen
+  
+  // --- ADDED FIREBASE SYNC ---
+  if (window.db) {
+    window.dbSet(window.dbRef(window.db, 'matches/' + id), null);
+  }
+  
+  renderDashboard(); 
+}
+
+function clearMatchLog() {
+  try { localStorage.removeItem('iplSimLog'); } catch(e) {}
+  memoryLog = [];
+  
+  // --- ADDED FIREBASE SYNC ---
+  if (window.db) {
+    window.dbSet(window.dbRef(window.db, 'matches'), null);
+  }
+  
+  renderDashboard(); 
 }
 
 function loadHistoricalMatch(id) {
@@ -2317,18 +2328,33 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // --- NEW: Firebase Sync Listener ---
   if (window.db) {
+    // 1. Sync Matches
     window.dbOnValue(window.dbRef(window.db, 'matches'), (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        // Convert object from Firebase to an array and update local storage
         const allMatches = Object.values(data);
         localStorage.setItem('iplSimLog', JSON.stringify(allMatches));
         
-        // If the dashboard is open, refresh it so the new matches appear instantly
         const dash = document.getElementById('slideDashboard');
-        if (dash && dash.classList.contains('open')) {
-          renderDashboard();
-        }
+        if (dash && dash.classList.contains('open')) renderDashboard();
+      }
+    });
+
+    // 2. Sync Bowling Orders
+    window.dbOnValue(window.dbRef(window.db, 'bowling_orders'), (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        Object.assign(customBowlingOrders, data);
+        localStorage.setItem('sackssim_bowling_orders', JSON.stringify(customBowlingOrders));
+      }
+    });
+
+    // 3. Sync Playing XI Rosters
+    window.dbOnValue(window.dbRef(window.db, 'rosters'), (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        Object.assign(TEAM_ROSTERS, data);
+        localStorage.setItem('sackssim_rosters', JSON.stringify(TEAM_ROSTERS));
       }
     });
   }
