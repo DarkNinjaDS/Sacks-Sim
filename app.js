@@ -2311,6 +2311,44 @@ function buildPlayer(d) {
 }
 
 // ===================================================
+//   FIREBASE BRIDGE
+// ===================================================
+
+window.startFirebaseSync = function() {
+  if (!window.db) return;
+
+  // 1. Sync Matches
+  window.dbOnValue(window.dbRef(window.db, 'matches'), (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      const allMatches = Object.values(data);
+      localStorage.setItem('iplSimLog', JSON.stringify(allMatches));
+      
+      const dash = document.getElementById('slideDashboard');
+      if (dash && dash.classList.contains('open')) renderDashboard();
+    }
+  });
+
+  // 2. Sync Bowling Orders
+  window.dbOnValue(window.dbRef(window.db, 'bowling_orders'), (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      Object.assign(customBowlingOrders, data);
+      localStorage.setItem('sackssim_bowling_orders', JSON.stringify(customBowlingOrders));
+    }
+  });
+
+  // 3. Sync Playing XI Rosters
+  window.dbOnValue(window.dbRef(window.db, 'rosters'), (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      Object.assign(TEAM_ROSTERS, data);
+      localStorage.setItem('sackssim_rosters', JSON.stringify(TEAM_ROSTERS));
+    }
+  });
+};
+
+// ===================================================
 //   INIT
 // ===================================================
 
@@ -2325,37 +2363,4 @@ window.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('liveSpeedRow').style.display = on ? 'block' : 'none';
     }, 0);
   });
-
-  // --- NEW: Firebase Sync Listener ---
-  if (window.db) {
-    // 1. Sync Matches
-    window.dbOnValue(window.dbRef(window.db, 'matches'), (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const allMatches = Object.values(data);
-        localStorage.setItem('iplSimLog', JSON.stringify(allMatches));
-        
-        const dash = document.getElementById('slideDashboard');
-        if (dash && dash.classList.contains('open')) renderDashboard();
-      }
-    });
-
-    // 2. Sync Bowling Orders
-    window.dbOnValue(window.dbRef(window.db, 'bowling_orders'), (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        Object.assign(customBowlingOrders, data);
-        localStorage.setItem('sackssim_bowling_orders', JSON.stringify(customBowlingOrders));
-      }
-    });
-
-    // 3. Sync Playing XI Rosters
-    window.dbOnValue(window.dbRef(window.db, 'rosters'), (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        Object.assign(TEAM_ROSTERS, data);
-        localStorage.setItem('sackssim_rosters', JSON.stringify(TEAM_ROSTERS));
-      }
-    });
-  }
 });
