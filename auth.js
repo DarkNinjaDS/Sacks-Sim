@@ -489,26 +489,27 @@ function _updateCountBadge() {
 function savePlayingXi(targetTeamKey) {
   if (!currentUser) return;
   
-  // Use the explicitly passed team key (from the master dropdown), or fallback to the player's team
   const teamKey = targetTeamKey || currentUser.team;
-  if (!teamKey) return; // No need for normalizeTeamKey anymore!
+  if (!teamKey) return; 
 
   if (_xiCurrentOrder.length < 11) {
     const missing = 11 - _xiCurrentOrder.length;
     if (!confirm(`You have ${missing} empty slot(s). Save anyway?`)) return;
   }
 
-  // Save selection using the user's direct team key
   TEAM_ROSTERS[teamKey] = [..._xiCurrentOrder, ..._xiBench];
 
-  // Save the updated rosters globally to localStorage
   try {
     localStorage.setItem('sackssim_rosters', JSON.stringify(TEAM_ROSTERS));
   } catch (e) {
     console.warn("Browser blocked saving to localStorage", e);
   }
 
-  // Show save message
+  // --- ADDED FIREBASE SYNC ---
+  if (window.db) {
+    window.dbSet(window.dbRef(window.db, 'rosters'), TEAM_ROSTERS);
+  }
+
   const msg = document.getElementById('xiSaveMsg');
   if (msg) {
     msg.style.display = 'block';
