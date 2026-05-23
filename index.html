@@ -884,9 +884,6 @@
 </div>
 
 </div><!-- /appWrapper -->
-
-<script src="app.js"></script>
-<script src="auth.js"></script>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -913,5 +910,7 @@
   window.dbSet = set;
   window.dbOnValue = onValue;
 </script>
+<script src="app.js"></script>
+<script src="auth.js"></script>
 </body>
 </html>
