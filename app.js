@@ -2317,15 +2317,19 @@ function buildPlayer(d) {
 window.startFirebaseSync = function() {
   if (!window.db) return;
 
-  // 1. Sync Matches
+  // 1. Sync Matches (With Corruption Filter!)
   window.dbOnValue(window.dbRef(window.db, 'matches'), (snapshot) => {
     const data = snapshot.val();
     if (data) {
-      const allMatches = Object.values(data);
+      // 🛡️ Filter out broken test data that lacks complete innings data
+      const allMatches = Object.values(data).filter(m => m && m.id && m.inn1 && m.inn2);
       localStorage.setItem('iplSimLog', JSON.stringify(allMatches));
       
       const dash = document.getElementById('slideDashboard');
       if (dash && dash.classList.contains('open')) renderDashboard();
+    } else {
+      // If database is completely empty, clear local storage too
+      localStorage.removeItem('iplSimLog');
     }
   });
 
