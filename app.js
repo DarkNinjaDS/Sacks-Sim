@@ -1630,8 +1630,6 @@ const DEFAULT_BOWLING_ORDERS = {
 
 let customBowlingOrders = { ...DEFAULT_BOWLING_ORDERS };
 
-let customBowlingOrders = {};
-
 // Try to load saved bowling orders from localStorage
 try {
   const savedOrders = JSON.parse(localStorage.getItem('sackssim_bowling_orders'));
