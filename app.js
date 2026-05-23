@@ -1915,17 +1915,18 @@ function getMatchLog() {
 }
 
 function saveMatchToLog(data) {
+  // Save to local storage as backup
   const log = getMatchLog();
   if (!data.id) {
     data.id = Date.now();
     data.date = new Date().toISOString();
   }
   log.push(data);
-  memoryLog = log; // Update fallback
-  try {
-    localStorage.setItem('iplSimLog', JSON.stringify(log));
-  } catch(e) {
-    console.warn("Browser blocked save. Match saved to memory instead.");
+  localStorage.setItem('iplSimLog', JSON.stringify(log));
+
+  // Sync to Firebase
+  if (window.db) {
+    window.dbSet(window.dbRef(window.db, 'matches/' + data.id), data);
   }
 }
 
@@ -2305,6 +2306,7 @@ function buildPlayer(d) {
 window.addEventListener('DOMContentLoaded', async () => {
   populateSelects();
   await loadPlayerData();
+
   // Show/hide speed selector when live toggle is flipped
   document.getElementById('liveToggle').addEventListener('click', () => {
     setTimeout(() => {
@@ -2312,4 +2314,22 @@ window.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('liveSpeedRow').style.display = on ? 'block' : 'none';
     }, 0);
   });
+
+  // --- NEW: Firebase Sync Listener ---
+  if (window.db) {
+    window.dbOnValue(window.dbRef(window.db, 'matches'), (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        // Convert object from Firebase to an array and update local storage
+        const allMatches = Object.values(data);
+        localStorage.setItem('iplSimLog', JSON.stringify(allMatches));
+        
+        // If the dashboard is open, refresh it so the new matches appear instantly
+        const dash = document.getElementById('slideDashboard');
+        if (dash && dash.classList.contains('open')) {
+          renderDashboard();
+        }
+      }
+    });
+  }
 });
