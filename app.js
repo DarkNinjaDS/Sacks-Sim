@@ -1556,13 +1556,76 @@ const DEFAULT_BOWLING_ORDERS = {
     "Harshal Patel", 
     "Avesh Khan", 
     "Harshal Patel"
-],
+  ],
   "anuj": [
-    // Add Anuj's permanent 20-over array here...
+    "Trent Boult",
+    "Hardik Pandya",
+    "Trent Boult",
+    "Hardik Pandya",
+    "Trent Boult",
+    "Will Jacks",
+    "Ravi Bishnoi",
+    "Will Jacks",
+    "Ravi Bishnoi",
+    "Mitchell Santner",
+    "Jasprit Bumrah",
+    "Ravi Bishnoi",
+    "Mitchell Santner",
+    "Ravi Bishnoi",
+    "Mitchell Santner",
+    "Jasprit Bumrah",
+    "Hardik Pandya",
+    "Jasprit Bumrah",
+    "Trent Boult",
+    "Jasprit Bumrah"
   ],
   "bhukla": [
     // Add Bhukla's permanent 20-over array here...
-  ]
+  ],
+   "pranav": [
+    "Arshdeep Singh",
+    "Ben Dwarshuis",
+    "Arshdeep Singh",
+    "Ben Dwarshuis",
+    "Axar Patel",
+    "Kuldeep Yadav",
+    "Axar Patel",
+    "Kuldeep Yadav",
+    "Yuzvendra Chahal",
+    "Kuldeep Yadav",
+    "Yuzvendra Chahal",
+    "Axar Patel",
+    "Yuzvendra Chahal",
+    "Marcus Stoinis",
+    "Ben Dwarshuis",
+    "Yuzvendra Chahal",
+    "Kuldeep Yadav",
+    "Arshdeep Singh",
+    "Ben Dwarshuis",
+    "Arshdeep Singh"
+  ],
+   "patake": [
+    "Jason Holder",
+    "Matheesha Pathirana",
+    "Jason Holder",
+    "Matheesha Pathirana",
+    "Sunil Narine",
+    "Rashid Khan",
+    "Varun Chakravarthy",
+    "Sunil Narine",
+    "Rashid Khan",
+    "Varun Chakravarthy",
+    "Rashid Khan",
+    "Varun Chakravarthy",
+    "Sunil Narine",
+    "Varun Chakravarthy",
+    "Rashid Khan",
+    "Sunil Narine",
+    "Matheesha Pathirana",
+    "Jason Holder",
+    "Matheesha Pathirana",
+    "Jason Holder"
+   ]
 };
 
 let customBowlingOrders = { ...DEFAULT_BOWLING_ORDERS };
@@ -1573,7 +1636,8 @@ let customBowlingOrders = {};
 try {
   const savedOrders = JSON.parse(localStorage.getItem('sackssim_bowling_orders'));
   if (savedOrders) {
-    customBowlingOrders = savedOrders;
+    // This merges their temporary local changes OVER the permanent defaults
+    Object.assign(customBowlingOrders, savedOrders);
   }
 } catch (e) {
   console.warn("Could not load custom bowling orders", e);
