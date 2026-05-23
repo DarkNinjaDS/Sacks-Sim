@@ -1534,6 +1534,39 @@ function stopLive() {
 //   CUSTOM BOWLING ORDERS
 // ===================================================
 
+const DEFAULT_BOWLING_ORDERS = {
+  "aqua": [
+    "Mohammad Shami", 
+    "Pat Cummins", 
+    "Mohammad Shami", 
+    "Avesh Khan", 
+    "Mohammad Shami",
+    "Wanindu Hasaranga", 
+    "Pat Cummins", 
+    "Wanindu Hasaranga", 
+    "Avesh Khan", 
+    "Wanindu Hasaranga",
+    "Pat Cummins", 
+    "Avesh Khan", 
+    "Wanindu Hasaranga", 
+    "Harshal Patel", 
+    "Mohammad Shami",
+    "Harshal Patel", 
+    "Pat Cummins", 
+    "Harshal Patel", 
+    "Avesh Khan", 
+    "Harshal Patel"
+],
+  "anuj": [
+    // Add Anuj's permanent 20-over array here...
+  ],
+  "bhukla": [
+    // Add Bhukla's permanent 20-over array here...
+  ]
+};
+
+let customBowlingOrders = { ...DEFAULT_BOWLING_ORDERS };
+
 let customBowlingOrders = {};
 
 // Try to load saved bowling orders from localStorage
